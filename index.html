@@ -154,12 +154,12 @@
                 <span id="timer"></span>
             </div>
             <div id="instructions">
-                矢印キー(←→)か画面タップで操作
+                Use ◀︎ / ▶︎ keys or tap the screen!
             </div>
 
             <div id="start-screen">
                 <h1> catch me if you Can<br>ロセツとエビフライ</h1>
-                <p id="start-text">Click or Tap to Start！</p>
+                <p id="start-text">Click or Tap to Start ▶︎ </p>
                 <div id="final-score"></div>
             </div>
         </div>
@@ -263,7 +263,7 @@
 
         // --- ゲーム進行 ---
         function startGame() { gameRunning = true; score = 0; timeLeft = GAME_DURATION; finalScoreEl.textContent = ''; startText.textContent = ''; startScreen.style.display = 'none'; resetObjects(); updateScore(); timerEl.textContent = `残り時間: ${timeLeft}`; timerId = setInterval(() => { timeLeft--; timerEl.textContent = `残り時間: ${timeLeft}`; if (timeLeft <= 0) { endGame(); }}, 1000); gameLoop(); }
-        async function endGame() { clearInterval(timerId); gameRunning = false; keys.left = false; keys.right = false; finalScoreEl.textContent = `最終スコア: ${score}`; startText.textContent = "もう一度プレイ！"; startScreen.style.display = 'flex'; if (db && userId) { try { await addDoc(collection(db, "scores"), { userId: userId, score: score, timestamp: serverTimestamp() }); } catch (error) { console.error("Error writing document: ", error); }}}
+        async function endGame() { clearInterval(timerId); gameRunning = false; keys.left = false; keys.right = false; finalScoreEl.textContent = `Final Score: ${score}`; startText.textContent = "Play Again！"; startScreen.style.display = 'flex'; if (db && userId) { try { await addDoc(collection(db, "scores"), { userId: userId, score: score, timestamp: serverTimestamp() }); } catch (error) { console.error("Error writing document: ", error); }}}
 
         // --- ゲームロジック ---
         function spawnShrimp() { const angle = Math.random() * Math.PI * 2; const radius = size * 0.48; shrimps.push({ x: center.x + radius * Math.cos(angle), y: center.y + radius * Math.sin(angle), angle: angle, });}
@@ -289,7 +289,7 @@
                     const data = doc.data();
                     const idPart = `...${data.userId.slice(-6)}`;
                     const li = document.createElement('li');
-                    li.innerHTML = `<span>${data.userId === userId ? 'あなた' : idPart}</span> <span class="score-val">${data.score}</span>`;
+                    li.innerHTML = `<span>${data.userId === userId ? 'YOU' : idPart}</span> <span class="score-val">${data.score}</span>`;
                     if (data.userId === userId) {
                         li.style.color = '#ffeb3b';
                     }
