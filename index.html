@@ -114,7 +114,7 @@
         }
         #leaderboard h2 {
             margin-top: 0;
-            color: #ffc107;
+            color: #0000ff;
             font-size: clamp(1.2rem, 4.5vmin, 1.5rem);
         }
         #leaderboard ol {
@@ -158,13 +158,13 @@
             </div>
 
             <div id="start-screen">
-                <h1>ロセツのブラックホールアドベンチャー</h1>
-                <p id="start-text">クリックまたはタップしてスタート！</p>
+                <h1>ロセツのブラックホール<br>エビフライアドベンチャー</h1>
+                <p id="start-text">Click or Tap to Start！</p>
                 <div id="final-score"></div>
             </div>
         </div>
         <div id="leaderboard">
-            <h2>🏆 ハイスコアランキング 🏆</h2>
+            <h2>🚀🍤 HIGH SCORE RANKING 🍤🚀</h2>
             <ol id="score-list"></ol>
         </div>
     </div>
@@ -176,16 +176,14 @@
         import { getFirestore, collection, addDoc, query, onSnapshot, serverTimestamp, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Firebase 設定 ---
-        // ▼▼▼【重要】ここにあなた自身のFirebase設定を貼り付けてください！▼▼▼
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyBDl5BYLTUbMQtuLqvXdlxpw1Ir0wX6NQg",
+            authDomain: "rosetsu-game.firebaseapp.com",
+            projectId: "rosetsu-game",
+            storageBucket: "rosetsu-game.firebasestorage.app",
+            messagingSenderId: "679751851017",
+            appId: "1:679751851017:web:57ea539491b2ac91162cd8"
         };
-        // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
         // --- DOM要素の取得 ---
         const canvas = document.getElementById('game-canvas');
@@ -215,14 +213,13 @@
         // --- Firebase 初期化 ---
         let db, auth, userId;
         try {
-            // Check if the user has replaced the placeholder config
             if (firebaseConfig.apiKey === "YOUR_API_KEY" || !firebaseConfig.apiKey) {
                 throw new Error("Firebase config is not set. Please follow the setup guide.");
             }
             const app = initializeApp(firebaseConfig);
             db = getFirestore(app);
             auth = getAuth(app);
-            
+
             onAuthStateChanged(auth, user => {
                 if (user) {
                     userId = user.uid;
@@ -234,12 +231,11 @@
 
         } catch (error) {
             console.error(error.message);
-            // Display a user-friendly message on the screen
             scoreListEl.innerHTML = '<li>Firebaseの設定が必要です。ガイドに従って設定情報をコードに貼り付けてください。</li>';
             userIdDisplay.textContent = "DB設定エラー";
             startText.innerHTML = "ランキング機能を使うには<br>設定が必要です";
         }
-        
+
         // --- SVGデータ ---
         const rosetsuSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 28 40 50"><g><ellipse cx="50" cy="60" rx="11" ry="15" fill="white" stroke="black" stroke-width="2" /><ellipse cx="50" cy="40" rx="12.5" ry="10" fill="white" stroke="black" stroke-width="2" /><path d="M 42.5 38 Q 35 33, 35 40" fill="white" stroke="black" stroke-width="2" /><path d="M 57.5 38 Q 65 33, 65 40" fill="white" stroke="black" stroke-width="2" /><circle cx="46" cy="39" r="1" fill="black" /><circle cx="54" cy="39" r="1" fill="black" /><circle cx="50" cy="42" r="1" fill="black" /><path d="M 46 45 Q 50 46, 54 45" stroke="black" stroke-width="1" fill="none" /></g><g><rect x="39" y="50" width="21" height="16" fill="#ffffe0" stroke="black" stroke-width="1.5" /><rect x="32" y="50" width="6" height="10" fill="#ffffe0" stroke="black" stroke-width="1.5" /><rect x="61" y="50" width="6" height="10" fill="#ffffe0" stroke="black" stroke-width="1.5" /></g></svg>`;
         const rosetsuImage = new Image();
@@ -257,18 +253,18 @@
         let lastSpawn = -1;
 
         function resetObjects() { player = { size: size * 0.08, angle: 0, speed: 0.05, orbitRadius: size * 0.3, x: 0, y: 0 }; shrimps = []; shrimpData = { size: size * 0.06, spawnRate: 1000, speed: 1 }; }
-        
+
         // --- イベントリスナー ---
         window.addEventListener('keydown', (e) => { if(gameRunning) { if (e.key === 'ArrowLeft') keys.left = true; if (e.key === 'ArrowRight') keys.right = true; }});
         window.addEventListener('keyup', (e) => { if (e.key === 'ArrowLeft') keys.left = false; if (e.key === 'ArrowRight') keys.right = false; });
         canvas.addEventListener('touchstart', (e) => { if(gameRunning) { e.preventDefault(); const touchX = e.touches[0].clientX - canvas.getBoundingClientRect().left; keys.left = touchX < canvas.width / 2; keys.right = touchX >= canvas.width / 2; }});
         canvas.addEventListener('touchend', (e) => { e.preventDefault(); keys.left = false; keys.right = false; });
         startScreen.addEventListener('click', () => { if (!gameRunning && firebaseConfig.apiKey !== "YOUR_API_KEY") startGame() });
-        
+
         // --- ゲーム進行 ---
         function startGame() { gameRunning = true; score = 0; timeLeft = GAME_DURATION; finalScoreEl.textContent = ''; startText.textContent = ''; startScreen.style.display = 'none'; resetObjects(); updateScore(); timerEl.textContent = `残り時間: ${timeLeft}`; timerId = setInterval(() => { timeLeft--; timerEl.textContent = `残り時間: ${timeLeft}`; if (timeLeft <= 0) { endGame(); }}, 1000); gameLoop(); }
         async function endGame() { clearInterval(timerId); gameRunning = false; keys.left = false; keys.right = false; finalScoreEl.textContent = `最終スコア: ${score}`; startText.textContent = "もう一度プレイ！"; startScreen.style.display = 'flex'; if (db && userId) { try { await addDoc(collection(db, "scores"), { userId: userId, score: score, timestamp: serverTimestamp() }); } catch (error) { console.error("Error writing document: ", error); }}}
-        
+
         // --- ゲームロジック ---
         function spawnShrimp() { const angle = Math.random() * Math.PI * 2; const radius = size * 0.48; shrimps.push({ x: center.x + radius * Math.cos(angle), y: center.y + radius * Math.sin(angle), angle: angle, });}
         function updatePlayer() { if (keys.left) player.angle -= player.speed; if (keys.right) player.angle += player.speed; player.x = center.x + player.orbitRadius * Math.cos(player.angle); player.y = center.y + player.orbitRadius * Math.sin(player.angle);}
@@ -279,10 +275,10 @@
         function drawBlackhole() { ctx.save(); const diskGradient = ctx.createRadialGradient(center.x, center.y, size * 0.1, center.x, center.y, size * 0.45); diskGradient.addColorStop(0, 'rgba(0,0,0,0)'); diskGradient.addColorStop(0.3, 'orangered'); diskGradient.addColorStop(0.6, 'orange'); diskGradient.addColorStop(1, 'rgba(255, 215, 0, 0.3)'); ctx.fillStyle = diskGradient; ctx.beginPath(); ctx.ellipse(center.x, center.y, size * 0.45, size * 0.25, 0, 0, 2 * Math.PI); ctx.fill(); ctx.fillStyle = "rgba(255, 165, 0, 0.7)"; ctx.beginPath(); ctx.moveTo(center.x, center.y); ctx.lineTo(size * 0.1, center.y - size * 0.02); ctx.lineTo(size * 0.1, center.y + size * 0.02); ctx.closePath(); ctx.fill(); ctx.beginPath(); ctx.moveTo(center.x, center.y); ctx.lineTo(size * 0.9, center.y - size * 0.02); ctx.lineTo(size * 0.9, center.y + size * 0.02); ctx.closePath(); ctx.fill(); const rings = [{ r: 0.13, c: "orangered" }, { r: 0.12, c: "black" }, { r: 0.11, c: "orangered" }, { r: 0.10, c: "black" }, { r: 0.09, c: "orangered" }, { r: 0.08, c: "black" }]; rings.forEach(ring => { ctx.strokeStyle = ring.c; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(center.x, center.y, size * ring.r, 0, 2 * Math.PI); ctx.stroke(); }); ctx.fillStyle = 'black'; ctx.beginPath(); ctx.arc(center.x, center.y, size * 0.08, 0, 2 * Math.PI); ctx.fill(); ctx.restore(); }
         function drawGameObjects() { ctx.save(); ctx.translate(player.x, player.y); ctx.rotate(player.angle + Math.PI / 2); if (rosetsuImage.complete) { ctx.drawImage(rosetsuImage, -player.size / 2, -player.size / 2, player.size, player.size); } ctx.restore(); shrimps.forEach(s => { ctx.save(); ctx.translate(s.x, s.y); ctx.rotate(s.angle + Math.PI / 2); if (shrimpImage.complete) { ctx.drawImage(shrimpImage, -shrimpData.size / 2, -shrimpData.size / 2, shrimpData.size, shrimpData.size); } ctx.restore(); });}
         function draw() { ctx.clearRect(0, 0, canvas.width, canvas.height); drawBlackhole(); if (gameRunning || score > 0 || timeLeft < GAME_DURATION) { drawGameObjects(); }}
-        
+
         // --- メインループ ---
         function gameLoop(timestamp) { if (!gameRunning) return; if (timestamp - lastSpawn > shrimpData.spawnRate) { lastSpawn = timestamp; spawnShrimp(); } updatePlayer(); updateShrimps(); draw(); requestAnimationFrame(gameLoop); }
-        
+
         // --- ランキング ---
         function setupLeaderboardListener() {
             if (!db) return;
@@ -301,7 +297,7 @@
                 });
             }, (error) => { console.error("Error getting leaderboard: ", error); scoreListEl.innerHTML = '<li>ランキングの取得に失敗しました</li>'; });
         }
-        
+
         // --- 初期化 ---
         window.addEventListener('resize', () => { size = gameContainer.clientWidth; canvas.width = size; canvas.height = size; center = { x: size / 2, y: size / 2 }; resetObjects(); draw(); });
         let imagesLoaded = 0;
