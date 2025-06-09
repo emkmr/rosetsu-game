@@ -100,7 +100,7 @@
         #final-score {
             font-size: clamp(1.2rem, 4.5vmin, 1.5rem);
             margin: 20px 0;
-            color: #ffc107;
+            color: #07c1ff;
         }
 
         #leaderboard {
@@ -294,7 +294,7 @@
                     const li = document.createElement('li');
                     li.innerHTML = `<span>${data.userId === userId ? 'YOU' : idPart}</span> <span class="score-val">${data.score}</span>`;
                     if (data.userId === userId) {
-                        li.style.color = '#ffeb3b';
+                        li.style.color = '#87ceeb';
                     }
                     scoreListEl.appendChild(li);
                 });
