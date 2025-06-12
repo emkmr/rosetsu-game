@@ -1,0 +1,20 @@
+{
+  "name": "ロセツのブラックホールアドベンチャー",
+  "short_name": "ロセツGAME",
+  "icons": [
+    {
+      "src": "icons/rosetsu_icons_01.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icons/rosetsu_icons_01.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000"
+}
