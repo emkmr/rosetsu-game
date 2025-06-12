@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ロセツのブラックホールアドベンチャー (共有版)</title>
+    <title>ロセツのブラックホールアドベンチャー</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&display=swap');
 
@@ -100,7 +103,7 @@
         #final-score {
             font-size: clamp(1.2rem, 4.5vmin, 1.5rem);
             margin: 20px 0;
-            color: #ffc107;
+            color: rgb(21, 131, 182);
         }
 
         #leaderboard {
@@ -159,9 +162,9 @@
 
             <div id="start-screen">
                 <h1>
-    <img src="top.jpg" alt="catch me if you can" style="width: 80%; max-width: 400px; height: auto;">
-    <br>ロセツとエビフライ
-</h1>
+                    <img src="top.jpg" alt="catch me if you can" style="width: 80%; max-width: 400px; height: auto;">
+                    <br>ロセツとエビフライ
+                </h1>
                 <p id="start-text">Click or Tap to Start ▶︎ </p>
                 <div id="final-score"></div>
             </div>
@@ -294,7 +297,7 @@
                     const li = document.createElement('li');
                     li.innerHTML = `<span>${data.userId === userId ? 'YOU' : idPart}</span> <span class="score-val">${data.score}</span>`;
                     if (data.userId === userId) {
-                        li.style.color = '#ffeb3b';
+                        li.style.color = '#00bfff';
                     }
                     scoreListEl.appendChild(li);
                 });
