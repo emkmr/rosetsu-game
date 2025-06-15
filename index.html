@@ -259,16 +259,24 @@
         const cucumberImage = new Image();
         cucumberImage.src = `data:image/svg+xml;base64,${btoa(cucumberSVG)}`;
 
+        // ★赤い車のSVGを追加
+        const carSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30"><path d="M5,10 h50 a5,5 0 0 1 5,5 v10 a5,5 0 0 1 -5,5 h-50 a5,5 0 0 1 -5,-5 v-10 a5,5 0 0 1 5,-5 z" fill="#d32f2f" stroke="black" stroke-width="1.5"/><path d="M10,5 h30 v10 h-30 z" fill="#ffcdd2" stroke="#a02424" stroke-width="1"/><circle cx="15" cy="25" r="5" fill="#212121" stroke="black" stroke-width="1"/><circle cx="45" cy="25" r="5" fill="#212121" stroke="black" stroke-width="1"/></svg>`;
+        const carImage = new Image();
+        carImage.src = `data:image/svg+xml;base64,${btoa(carSVG)}`;
+
 
         // --- ゲームオブジェクト設定 ---
         let player = {};
         let komaruPlayer = null;
         let shrimps = [];
         let cucumbers = [];
+        let cars = []; // ★追加
         let shrimpData = {};
         let cucumberData = {};
+        let carData = {}; // ★追加
         const keys = { left: false, right: false };
         let lastSpawn = -1;
+        let lastCarSpawn = -1; // ★追加
         let cucumberHasBeenCaught = false;
         let feverTimerId = null; 
         let isFeverTime = false;
@@ -279,8 +287,10 @@
             komaruPlayer = null;
             shrimps = [];
             cucumbers = [];
+            cars = []; // ★追加
             shrimpData = { size: size * 0.06, spawnRate: 1000, originalSpawnRate: 1000, speed: 1 };
-            cucumberData = { size: size * 0.07, speed: 1 }; 
+            cucumberData = { size: size * 0.05, speed: 2 }; 
+            carData = { size: size * 0.08, speed: 1.5 }; // ★追加
             cucumberHasBeenCaught = false; 
             
             clearTimeout(feverTimerId);
@@ -324,6 +334,9 @@
         function spawnShrimp() { const angle = Math.random() * Math.PI * 2; const radius = size * 0.48; shrimps.push({ x: center.x + radius * Math.cos(angle), y: center.y + radius * Math.sin(angle), angle: angle, });}
         
         function spawnCucumber() { const angle = Math.random() * Math.PI * 2; const radius = size * 0.48; cucumbers.push({ x: center.x + radius * Math.cos(angle), y: center.y + radius * Math.sin(angle), angle: angle, });}
+        
+        // ★車を出現させる関数を追加
+        function spawnCar() { const angle = Math.random() * Math.PI * 2; const radius = size * 0.48; cars.push({ x: center.x + radius * Math.cos(angle), y: center.y + radius * Math.sin(angle), angle: angle, });}
 
         function updatePlayer() {
             if (keys.left) player.angle -= player.speed;
@@ -390,6 +403,30 @@
                     }
                 } else if (distToCenter < size * 0.12) {
                     cucumbers.splice(i, 1);
+                }
+            }
+
+            // ★車の更新と当たり判定を追加
+            for (let i = cars.length - 1; i >= 0; i--) {
+                const car = cars[i];
+                const dx = center.x - car.x;
+                const dy = center.y - car.y;
+                const distToCenter = Math.sqrt(dx * dx + dy * dy);
+                car.x += (dx / distToCenter) * carData.speed;
+                car.y += (dy / distToCenter) * carData.speed;
+
+                const playerDist = Math.sqrt(Math.pow(player.x - car.x, 2) + Math.pow(player.y - car.y, 2));
+                if (playerDist < player.size / 2 + carData.size / 2) {
+                    cars.splice(i, 1);
+                    score -= 5;
+                    if (score < 0) score = 0; // スコアがマイナスにならないようにする
+                    updateScore();
+                    continue; // プレイヤーに当たったら他の判定は不要
+                }
+                
+                // ブラックホールに吸い込まれた場合
+                if (distToCenter < size * 0.12) {
+                    cars.splice(i, 1);
                 }
             }
         }
@@ -482,6 +519,18 @@
                 if (cucumberImage.complete) { ctx.drawImage(cucumberImage, -cucumberData.size / 2, -cucumberData.size / 2, cucumberData.size, cucumberData.size); }
                 ctx.restore();
             });
+
+            // ★車描画を追加
+            cars.forEach(car => {
+                ctx.save();
+                ctx.translate(car.x, car.y);
+                ctx.rotate(car.angle + Math.PI / 2); // 進行方向を向く
+                if (carImage.complete) {
+                    // SVGのアスペクト比に合わせて描画サイズを調整
+                    ctx.drawImage(carImage, -carData.size / 2, -carData.size / 4, carData.size, carData.size / 2);
+                }
+                ctx.restore();
+            });
         }
 
         function draw() {
@@ -495,6 +544,8 @@
         // --- メインループ ---
         function gameLoop(timestamp) {
             if (!gameRunning) return;
+
+            // ★エビフライ・きゅうりの出現ロジックを修正
             if (timestamp - lastSpawn > shrimpData.spawnRate) {
                 lastSpawn = timestamp;
                 if (isFeverTime) {
@@ -505,6 +556,14 @@
                     spawnShrimp();
                 }
             }
+
+            // ★車の出現ロジックを追加
+            const CAR_SPAWN_INTERVAL = 4000; // 4秒ごとに出現
+            if (!isFeverTime && timestamp - lastCarSpawn > CAR_SPAWN_INTERVAL) {
+                lastCarSpawn = timestamp;
+                spawnCar();
+            }
+
             updatePlayer();
             updateItems();
             draw();
@@ -535,7 +594,7 @@
         
         let imagesLoaded = 0;
         function onImageLoad() {
-            if (++imagesLoaded === 4) {
+            if (++imagesLoaded === 5) { // ★4から5に変更
                 draw();
             }
         }
@@ -543,6 +602,7 @@
         shrimpImage.onload = onImageLoad;
         komaruImage.onload = onImageLoad;
         cucumberImage.onload = onImageLoad;
+        carImage.onload = onImageLoad; // ★追加
         resetObjects();
     </script>
 </body>
