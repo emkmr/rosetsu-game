@@ -263,7 +263,6 @@
         const carImage = new Image();
         carImage.src = `data:image/svg+xml;base64,${btoa(carSVG)}`;
 
-        // ★★★ START: 鉄二と野球ボールのSVGを追加 ★★★
         const tetsujiSVG = `<svg width="250" height="140" viewBox="0 0 250 140" xmlns="http://www.w3.org/2000/svg"><g transform="translate(40,10)"><ellipse cx="15" cy="70" rx="18" ry="12" fill="#f5deb3" stroke="black" stroke-width="2" transform="rotate(-40 15 70)"/><ellipse cx="85" cy="75" rx="55" ry="32" fill="#f5deb3" stroke="black" stroke-width="2"/><path d="M110 92 q18 20 -6 23 q-19 -1 -14 -22 z" fill="#f5deb3" stroke="black" stroke-width="2"/><path d="M70 92 q-18 18 5 22 q18 -1 13 -21 z" fill="#f5deb3" stroke="black" stroke-width="2"/><rect x="70" y="57" width="52" height="10" rx="5" fill="black"/><g transform="translate(95,67)"><circle r="8" fill="white" stroke="black" stroke-width="1.2"/><path d="M-5 -4 q5 3 10 0" fill="none" stroke="#e53935" stroke-width="1.3"/><path d="M-5 4 q5 -3 10 0" fill="none" stroke="#e53935" stroke-width="1.3"/></g><ellipse cx="96" cy="47" rx="40" ry="28" fill="#f5deb3" stroke="black" stroke-width="2"/><ellipse cx="96" cy="57" rx="25" ry="9" fill="#3d3532" stroke="black" stroke-width="1.5"/><ellipse cx="60" cy="42" rx="16" ry="14" fill="#f5deb3" stroke="black" stroke-width="2"/><ellipse cx="132" cy="42" rx="16" ry="14" fill="#f5deb3" stroke="black" stroke-width="2"/><g fill="black"><circle cx="82" cy="49" r="5"/><circle cx="110" cy="49" r="5"/><circle cx="80.5" cy="48" r="1.5" fill="white"/><circle cx="108.5" cy="48" r="1.5" fill="white"/><circle cx="96" cy="60" r="4"/><path d="M90 66 q6 4 12 0" fill="none" stroke="white" stroke-width="2"/></g><g stroke="#3d3532" stroke-width="4" stroke-linecap="round" fill="none"><path d="M74 41 q7 -6 14 0"/><path d="M102 41 q7 -6 14 0"/></g></g></svg>`;
         const tetsujiImage = new Image();
         tetsujiImage.src = `data:image/svg+xml;base64,${btoa(tetsujiSVG)}`;
@@ -271,50 +270,49 @@
         const baseballSVG = `<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="30" r="25" fill="white" stroke="black" stroke-width="1.2"/><path d="M12 15 Q30 22,48 15" fill="none" stroke="#e53935" stroke-width="2"/><path d="M12 45 Q30 38,48 45" fill="none" stroke="#e53935" stroke-width="2"/><g stroke="#e53935" stroke-width="1.2"><line x1="17" y1="18" x2="20" y2="19"/><line x1="23" y1="20" x2="26" y2="21"/><line x1="29" y1="22" x2="32" y2="23"/><line x1="35" y1="22" x2="38" y2="23"/><line x1="41" y1="20" x2="44" y2="19"/><line x1="17" y1="42" x2="20" y2="41"/><line x1="23" y1="40" x2="26" y2="39"/><line x1="29" y1="38" x2="32" y2="37"/><line x1="35" y1="38" x2="38" y2="37"/><line x1="41" y1="40" x2="44" y2="41"/></g></svg>`;
         const baseballImage = new Image();
         baseballImage.src = `data:image/svg+xml;base64,${btoa(baseballSVG)}`;
-        // ★★★ END: 鉄二と野球ボールのSVGを追加 ★★★
 
         // --- ゲームオブジェクト設定 ---
         let player = {};
         let komaruPlayer = null;
-        let tetsujiPlayer = null; // ★追加
+        let tetsujiPlayer = null;
         let shrimps = [];
         let cucumbers = [];
-        let baseballs = []; // ★追加
+        let baseballs = [];
         let cars = [];
         let shrimpData = {};
         let cucumberData = {};
-        let baseballData = {}; // ★追加
+        let baseballData = {};
         let carData = {};
         const keys = { left: false, right: false };
         let lastSpawn = -1;
         let lastCarSpawn = -1;
         let cucumberHasBeenCaught = false;
-        let baseballHasBeenCaught = false; // ★追加
+        let baseballHasBeenCaught = false;
         let feverTimerId = null; 
         let isFeverTime = false;
-        let tetsujiFeverTimerId = null; // ★追加
-        let isTetsujiFeverTime = false; // ★追加
+        let tetsujiFeverTimerId = null;
+        let isTetsujiFeverTime = false;
 
         // ゲーム開始時に変数をリセットする
         function resetObjects() {
             player = { size: size * 0.08, angle: 0, speed: 0.05, orbitRadius: size * 0.3, x: 0, y: 0 };
             komaruPlayer = null;
-            tetsujiPlayer = null; // ★追加
+            tetsujiPlayer = null;
             shrimps = [];
             cucumbers = [];
-            baseballs = []; // ★追加
+            baseballs = [];
             cars = [];
             shrimpData = { size: size * 0.06, spawnRate: 1000, originalSpawnRate: 1000, speed: 1 };
             cucumberData = { size: size * 0.05, speed: 2 }; 
-            baseballData = { size: size * 0.06, speed: 1.8 }; // ★追加
+            baseballData = { size: size * 0.06, speed: 1.8 };
             carData = { size: size * 0.08, speed: 1.3 };
             cucumberHasBeenCaught = false; 
-            baseballHasBeenCaught = false; // ★追加
+            baseballHasBeenCaught = false;
             
             clearTimeout(feverTimerId);
             isFeverTime = false;
-            clearTimeout(tetsujiFeverTimerId); // ★追加
-            isTetsujiFeverTime = false; // ★追加
+            clearTimeout(tetsujiFeverTimerId);
+            isTetsujiFeverTime = false;
 
             if(shrimpData.spawnRate !== shrimpData.originalSpawnRate) {
                 shrimpData.spawnRate = shrimpData.originalSpawnRate;
@@ -350,13 +348,15 @@
         function endFeverTime() {
             isFeverTime = false;
             shrimpData.spawnRate = shrimpData.originalSpawnRate;
-            komaruPlayer = null; // komaruを消す
+            komaruPlayer = null;
         }
         
         // ★鉄二フィーバーを開始
         function startTetsujiFeverTime() {
             const FEVER_DURATION = 5000; // 5秒間
+            const FEVER_SPAWN_RATE = 150; // 鉄二フィーバー中の出現レート
             isTetsujiFeverTime = true;
+            shrimpData.spawnRate = FEVER_SPAWN_RATE; // ★エビフライの出現レートを上げる
             
             clearTimeout(tetsujiFeverTimerId);
             tetsujiFeverTimerId = setTimeout(endTetsujiFeverTime, FEVER_DURATION);
@@ -365,14 +365,14 @@
         // ★鉄二フィーバーを終了
         function endTetsujiFeverTime() {
             isTetsujiFeverTime = false;
-            tetsujiPlayer = null; // 鉄二を消す
+            shrimpData.spawnRate = shrimpData.originalSpawnRate; // ★出現レートを元に戻す
+            tetsujiPlayer = null;
         }
 
         // --- ゲームロジック ---
         function spawnShrimp() { const angle = Math.random() * Math.PI * 2; const radius = size * 0.48; shrimps.push({ x: center.x + radius * Math.cos(angle), y: center.y + radius * Math.sin(angle), angle: angle, });}
         function spawnCucumber() { const angle = Math.random() * Math.PI * 2; const radius = size * 0.48; cucumbers.push({ x: center.x + radius * Math.cos(angle), y: center.y + radius * Math.sin(angle), angle: angle, });}
         function spawnCar() { const angle = Math.random() * Math.PI * 2; const radius = size * 0.48; cars.push({ x: center.x + radius * Math.cos(angle), y: center.y + radius * Math.sin(angle), angle: angle, });}
-        // ★野球ボールを出現させる関数を追加
         function spawnBaseball() { const angle = Math.random() * Math.PI * 2; const radius = size * 0.48; baseballs.push({ x: center.x + radius * Math.cos(angle), y: center.y + radius * Math.sin(angle), angle: angle, });}
 
         function updatePlayer() {
@@ -386,9 +386,8 @@
                 komaruPlayer.x = center.x + komaruPlayer.orbitRadius * Math.cos(komaruPlayer.angle);
                 komaruPlayer.y = center.y + komaruPlayer.orbitRadius * Math.sin(komaruPlayer.angle);
             }
-            // ★鉄二もプレイヤーに追従
             if (tetsujiPlayer) {
-                tetsujiPlayer.angle = player.angle + Math.PI; // プレイヤーの反対側
+                tetsujiPlayer.angle = player.angle + Math.PI;
                 tetsujiPlayer.x = center.x + tetsujiPlayer.orbitRadius * Math.cos(tetsujiPlayer.angle);
                 tetsujiPlayer.y = center.y + tetsujiPlayer.orbitRadius * Math.sin(tetsujiPlayer.angle);
             }
@@ -401,7 +400,6 @@
                 const dx = center.x - s.x;
                 const dy = center.y - s.y;
                 const distToCenter = Math.sqrt(dx * dx + dy * dy);
-                // ★鉄二フィーバー中はエビフライの速度アップ
                 const currentShrimpSpeed = isTetsujiFeverTime ? shrimpData.speed * 2.5 : shrimpData.speed;
                 s.x += (dx / distToCenter) * currentShrimpSpeed;
                 s.y += (dy / distToCenter) * currentShrimpSpeed;
@@ -425,7 +423,6 @@
                     }
                 }
                 
-                // ★鉄二もエビフライをキャッチ
                 if (tetsujiPlayer) {
                     const tetsujiSize = player.size;
                     const tetsujiDist = Math.sqrt(Math.pow(tetsujiPlayer.x - s.x, 2) + Math.pow(tetsujiPlayer.y - s.y, 2));
@@ -463,7 +460,7 @@
                 }
             }
 
-            // ★野球ボールの更新と当たり判定を追加
+            // 野球ボールの更新と当たり判定
             for (let i = baseballs.length - 1; i >= 0; i--) {
                 const b = baseballs[i];
                 const dx = center.x - b.x;
@@ -515,7 +512,6 @@
             }
         }
 
-        // ★鉄二を登場させる関数
         function activateTetsuji() {
             if (!tetsujiPlayer) {
                 tetsujiPlayer = { ...player, angle: player.angle + Math.PI };
@@ -540,14 +536,14 @@
                 rainbowGradient.addColorStop(1, `hsl(${(hue + 300) % 360}, 80%, 60%)`);
                 ctx.fillStyle = rainbowGradient;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-            } else if (isTetsujiFeverTime) { // ★鉄二フィーバー中のエフェクト
+            } else if (isTetsujiFeverTime) {
                 const t = performance.now() / 150;
-                ctx.fillStyle = '#00001a'; // 深い青
+                ctx.fillStyle = '#00001a';
                 ctx.fillRect(0,0,canvas.width, canvas.height);
                 
                 ctx.lineWidth = 1.5;
                 for(let i=0; i < 60; i++) {
-                    ctx.strokeStyle = `hsl(${(180 + i * 20) % 360}, 100%, ${60 + Math.sin(t+i) * 15}%)`; // 青から紫のスパーク
+                    ctx.strokeStyle = `hsl(${(180 + i * 20) % 360}, 100%, ${60 + Math.sin(t+i) * 15}%)`;
                     ctx.beginPath();
                     const startAngle = (i * 6) * Math.PI / 180 + t / 10;
                     const startRadius = size * 0.08;
@@ -604,7 +600,7 @@
                 ctx.restore();
             }
 
-            // ★鉄二描画
+            // ★鉄二描画（サイズ変更）
             if (tetsujiPlayer) {
                 ctx.save();
                 ctx.translate(tetsujiPlayer.x, tetsujiPlayer.y);
@@ -634,7 +630,7 @@
                 ctx.restore();
             });
             
-            // ★野球ボール描画
+            // 野球ボール描画
             baseballs.forEach(b => {
                 ctx.save();
                 ctx.translate(b.x, b.y);
@@ -673,17 +669,15 @@
                 spawnShrimp();
             }
 
-            // ★特殊アイテム（きゅうり、野球ボール）の出現ロジック
+            // 特殊アイテム（きゅうり、野球ボール）の出現ロジック
             if (cucumbers.length === 0 && baseballs.length === 0 && !isFeverTime && !isTetsujiFeverTime) {
-                // きゅうりは一度も捕まえられていない、かつ、ゲーム開始5秒後から残り10秒までの間に出現チャンス
                 if (!cucumberHasBeenCaught && timeLeft < GAME_DURATION - 5 && timeLeft > 10) {
-                    if (Math.random() < 0.005) { // フレームごとの低い確率
+                    if (Math.random() < 0.005) {
                         spawnCucumber();
                     }
                 }
-                // 野球ボールは一度も捕まえられていない、かつ、ゲーム開始10秒後から残り5秒までの間に出現チャンス
                 if (!baseballHasBeenCaught && timeLeft < GAME_DURATION - 10 && timeLeft > 5) {
-                    if (Math.random() < 0.005) { // フレームごとの低い確率
+                    if (Math.random() < 0.005) {
                         spawnBaseball();
                     }
                 }
@@ -726,7 +720,7 @@
         
         let imagesLoaded = 0;
         function onImageLoad() {
-            if (++imagesLoaded === 7) { // ★画像アセットが7つになったので更新
+            if (++imagesLoaded === 7) {
                 draw();
             }
         }
@@ -735,8 +729,8 @@
         komaruImage.onload = onImageLoad;
         cucumberImage.onload = onImageLoad;
         carImage.onload = onImageLoad;
-        tetsujiImage.onload = onImageLoad; // ★追加
-        baseballImage.onload = onImageLoad; // ★追加
+        tetsujiImage.onload = onImageLoad;
+        baseballImage.onload = onImageLoad;
         resetObjects();
     </script>
 </body>
