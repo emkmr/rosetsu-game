@@ -1,275 +1,609 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ロセツのブラックホールアドベンチャー</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="icons/icon-192x192.png" />
-  <style>
-    @import url("https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&display=swap");
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ロセツのブラックホールアドベンチャー</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&display=swap');
 
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
-      font-family: "M PLUS Rounded 1c", sans-serif;
-      background: #000;
-      color: #fff;
-    }
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #000000;
+            color: #fff;
+            font-family: 'Avenir', Hiragino Sans, Arial, sans-serif;
+            overflow-x: hidden;
+            text-align: center;
+            padding: 20px 0;
+        }
 
-    canvas {
-      display: block;
-    }
+        #game-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
 
-    #start-screen {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background: #000;
-      z-index: 10;
-      cursor: pointer;
-      user-select: none;
-    }
+        #game-container {
+            position: relative;
+            width: 95vmin;
+            height: 95vmin;
+            max-width: 600px;
+            max-height: 600px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: black;
+        }
 
-    #title-image {
-      max-width: 75%;
-      height: auto;
-      margin-bottom: 24px;
-    }
+        #game-canvas {
+            position: relative;
+            z-index: 2;
+            background-color: transparent;
+            width: 100%;
+            height: 100%;
+        }
 
-    #start-screen p {
-      margin: 0;
-      font-size: 22px;
-    }
+        #ui-container {
+            position: absolute;
+            top: 2%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            color: white;
+            font-size: clamp(1rem, 4vmin, 1.8rem);
+            text-shadow: 2px 2px 4px #000;
+            display: flex;
+            justify-content: space-between;
+            width: 90%;
+            pointer-events: none;
+        }
 
-    #score {
-      position: fixed;
-      top: 12px;
-      left: 12px;
-      font-size: 20px;
-      font-weight: bold;
-      z-index: 5;
-    }
-  </style>
+        #instructions {
+            position: absolute;
+            bottom: 2%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            color: white;
+            font-size: clamp(0.8rem, 2.5vmin, 1rem);
+            text-shadow: 2px 2px 4px #000;
+            pointer-events: none;
+        }
+
+        #start-screen {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            cursor: pointer;
+        }
+        #start-screen h1 {
+            font-size: clamp(1.5rem, 6vmin, 2.2rem);
+            margin-bottom: 10px;
+            padding: 0 10px;
+        }
+        #start-screen p {
+            font-size: clamp(1rem, 3.5vmin, 1.2rem);
+        }
+        #final-score {
+            font-size: clamp(1.2rem, 4.5vmin, 1.5rem);
+            margin: 20px 0;
+            color: rgb(21, 131, 182);
+        }
+
+        #leaderboard {
+            width: 95vmin;
+            max-width: 600px;
+            padding: 15px;
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+        #leaderboard h2 {
+            margin-top: 0;
+            color: #0000ff;
+            font-size: clamp(1.2rem, 4.5vmin, 1.5rem);
+        }
+        #leaderboard ol {
+            padding-left: 25px;
+            margin: 0;
+            list-style-type: decimal;
+        }
+        #leaderboard li {
+            font-size: clamp(0.9rem, 3vmin, 1rem);
+            padding: 4px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        #leaderboard .score-val {
+            font-weight: bold;
+            color: #ffffff;
+            margin-left: 10px;
+        }
+        #user-id-display {
+            position: fixed;
+            bottom: 5px;
+            left: 5px;
+            font-size: 0.7em;
+            color: rgba(255,255,255,0.3);
+            z-index: 20;
+        }
+
+    </style>
 </head>
 <body>
-  <div id="score">0</div>
-  <div id="start-screen">
-    <!-- トップ画像（適宜差し替えてください） -->
-    <img id="title-image" src="images/title.png" alt="タイトル画像" />
-    <p>タップまたはクリックでスタート！</p>
-  </div>
-  <canvas id="gameCanvas"></canvas>
 
-  <script>
-    // ---------- CONFIG ----------
-    const SPAWN_INTERVAL = 1200; // ms
-    const PLAYER_RADIUS = 28;
-    const OBJECT_RADIUS = 24;
-    const FEVER_DURATION = 8000; // ms
+    <div id="game-wrapper">
+        <div id="game-container">
+            <canvas id="game-canvas"></canvas>
+            <div id="ui-container">
+                <span id="score">エビフライ: 0</span>
+                <span id="timer"></span>
+            </div>
+            <div id="instructions">
+                Use ◀︎ / ▶︎ keys <br> or <br> tap the screen!
+            </div>
 
-    // ---------- IMAGE PRELOAD ----------
-    const sources = {
-      cucumber: "images/cucumber.png",
-      komaru: "images/komaru.png",
-      baseball: "images/baseball.png",
-      tetsuji: "images/tetsuji.png",
-      player: "images/player.png",
-    };
-    const images = {};
-    let loaded = 0;
-    const totalImages = Object.keys(sources).length;
-    for (const key in sources) {
-      images[key] = new Image();
-      images[key].src = sources[key];
-      images[key].onload = () => {
-        loaded++;
-        if (loaded === totalImages) init();
-      };
-    }
+            <div id="start-screen">
+                <h1>
+                    <img src="top.jpg" alt="catch me if you can" style="width: 80%; max-width: 400px; height: auto;">
+                    <br>ロセツとエビフライ
+                </h1>
+                <p id="start-text">Click or Tap to Start ▶︎ </p>
+                <div id="final-score"></div>
+            </div>
+        </div>
+        <div id="leaderboard">
+            <h2>🚀🍤 HIGH SCORE RANKING 🍤🚀</h2>
+            <ol id="score-list"></ol>
+        </div>
+    </div>
+    <div id="user-id-display"></div>
 
-    // ---------- CANVAS ----------
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
-    function resize() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener("resize", resize);
-    resize();
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, onSnapshot, serverTimestamp, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // ---------- GAME STATE ----------
-    let lastSpawn = 0;
-    let objects = [];
-    let score = 0;
-    let feverUntil = 0;
-    const player = { x: canvas.width / 2, y: canvas.height - PLAYER_RADIUS * 3 };
+        // --- Firebase 設定 ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBDl5BYLTUbMQtuLqvXdlxpw1Ir0wX6NQg",
+            authDomain: "rosetsu-game.firebaseapp.com",
+            projectId: "rosetsu-game",
+            storageBucket: "rosetsu-game.firebasestorage.app",
+            messagingSenderId: "679751851017",
+            appId: "1:679751851017:web:57ea539491b2ac91162cd8"
+        };
 
-    // ---------- INPUT ----------
-    let pointerX = player.x;
-    canvas.addEventListener("mousemove", (e) => (pointerX = e.clientX));
-    canvas.addEventListener(
-      "touchmove",
-      (e) => {
-        pointerX = e.touches[0].clientX;
-        e.preventDefault();
-      },
-      { passive: false }
-    );
+        // --- DOM要素の取得 ---
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const scoreEl = document.getElementById('score');
+        const timerEl = document.getElementById('timer');
+        const startScreen = document.getElementById('start-screen');
+        const startText = document.getElementById('start-text');
+        const finalScoreEl = document.getElementById('final-score');
+        const gameContainer = document.getElementById('game-container');
+        const scoreListEl = document.getElementById('score-list');
+        const userIdDisplay = document.getElementById('user-id-display');
 
-    // ---------- START ----------
-    function hideStart() {
-      document.getElementById("start-screen").style.display = "none";
-    }
+        // --- ゲーム設定 ---
+        let score = 0;
+        let gameRunning = false;
+        const GAME_DURATION = 30;
+        let timerId;
+        let timeLeft = GAME_DURATION;
 
-    // 画像と背景両方にリスナを付ける
-    ["start-screen", "title-image"].forEach((id) => {
-      document
-        .getElementById(id)
-        .addEventListener(
-          "click",
-          () => {
-            hideStart();
-            requestAnimationFrame(loop);
-          },
-          { once: true }
-        );
-      document
-        .getElementById(id)
-        .addEventListener(
-          "touchstart",
-          (e) => {
-            e.preventDefault();
-            hideStart();
-            requestAnimationFrame(loop);
-          },
-          { once: true }
-        );
-    });
+        // --- キャンバスサイズ設定 ---
+        let size = gameContainer.clientWidth;
+        canvas.width = size;
+        canvas.height = size;
+        let center = { x: size / 2, y: size / 2 };
 
-    function init() {
-      /* 画像ロード完了 */
-    }
+        // --- Firebase 初期化 ---
+        let db, auth, userId;
+        try {
+            if (firebaseConfig.apiKey === "YOUR_API_KEY" || !firebaseConfig.apiKey) {
+                throw new Error("Firebase config is not set. Please follow the setup guide.");
+            }
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
 
-    // ---------- GAME LOOP ----------
-    function loop(timestamp) {
-      update(timestamp);
-      render();
-      requestAnimationFrame(loop);
-    }
+            onAuthStateChanged(auth, user => {
+                if (user) {
+                    userId = user.uid;
+                    userIdDisplay.textContent = `ユーザーID: ${userId.slice(0,8)}...`;
+                    setupLeaderboardListener();
+                }
+            });
+            signInAnonymously(auth);
 
-    function update(ts) {
-      // プレイヤー追従
-      player.x += (pointerX - player.x) * 0.2;
-
-      // オブジェクト生成
-      if (ts - lastSpawn > SPAWN_INTERVAL) {
-        spawnObject();
-        lastSpawn = ts;
-      }
-
-      // 移動 & 当たり判定
-      objects.forEach((obj) => {
-        obj.y += obj.vy;
-        obj.x += obj.vx;
-
-        // プレイヤーと衝突
-        if (
-          Math.hypot(obj.x - player.x, obj.y - player.y) <
-          PLAYER_RADIUS + OBJECT_RADIUS
-        ) {
-          handleCatch(obj);
-          obj.dead = true;
+        } catch (error) {
+            console.error(error.message);
+            scoreListEl.innerHTML = '<li>Firebaseの設定が必要です。ガイドに従って設定情報をコードに貼り付けてください。</li>';
+            userIdDisplay.textContent = "DB設定エラー";
+            startText.innerHTML = "ランキング機能を使うには<br>設定が必要です";
         }
-      });
-      objects = objects.filter((o) => !o.dead && o.y < canvas.height + 50);
-    }
 
-    function handleCatch(obj) {
-      if (obj.type === "cucumber") {
-        feverUntil = performance.now() + FEVER_DURATION;
-        spawnEffect("komaru");
-      } else if (obj.type === "baseball") {
-        spawnEffect("tetsuji");
-      }
-      score += 10;
-      document.getElementById("score").textContent = score;
-    }
+        // --- SVGデータ ---
+        const rosetsuSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 28 40 50"><g><ellipse cx="50" cy="60" rx="11" ry="15" fill="white" stroke="black" stroke-width="2" /><ellipse cx="50" cy="40" rx="12.5" ry="10" fill="white" stroke="black" stroke-width="2" /><path d="M 42.5 38 Q 35 33, 35 40" fill="white" stroke="black" stroke-width="2" /><path d="M 57.5 38 Q 65 33, 65 40" fill="white" stroke="black" stroke-width="2" /><circle cx="46" cy="39" r="1" fill="black" /><circle cx="54" cy="39" r="1" fill="black" /><circle cx="50" cy="42" r="1" fill="black" /><path d="M 46 45 Q 50 46, 54 45" stroke="black" stroke-width="1" fill="none" /></g><g><rect x="39" y="50" width="21" height="16" fill="#ffffe0" stroke="black" stroke-width="1.5" /><rect x="32" y="50" width="6" height="10" fill="#ffffe0" stroke="black" stroke-width="1.5" /><rect x="61" y="50" width="6" height="10" fill="#ffffe0" stroke="black" stroke-width="1.5" /></g></svg>`;
+        const rosetsuImage = new Image();
+        rosetsuImage.src = `data:image/svg+xml;base64,${btoa(rosetsuSVG)}`;
 
-    function spawnEffect(type) {
-      // プレイヤーの頭上にペットを出現
-      const pet = {
-        x: player.x,
-        y: player.y - PLAYER_RADIUS * 2,
-        img: images[type],
-        life: 2000,
-        born: performance.now(),
-      };
-      objects.push({ type: "pet", data: pet });
-    }
+        const shrimpSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="45 50 10 15"><g><path d="M 49.5 54 Q 52.5 51, 49.5 52" fill="red" stroke="black" stroke-width="0.4" /> <path d="M 49.5 54 Q 46.5 51, 49.5 52" fill="red" stroke="black" stroke-width="0.4" /> <ellipse cx="49.5" cy="57.5" rx="2" ry="5" fill="#FF9800" stroke="black" stroke-width="0.4" /><ellipse cx="49.5" cy="57.5" rx="2.4" ry="5.6" fill="none" stroke="black" stroke-dasharray="0.8" stroke-width="0.2" /></g></svg>`;
+        const shrimpImage = new Image();
+        shrimpImage.src = `data:image/svg+xml;base64,${btoa(shrimpSVG)}`;
 
-    function spawnObject() {
-      const side = Math.random() < 0.5 ? -OBJECT_RADIUS : canvas.width + OBJECT_RADIUS;
-      const x = side;
-      const y = Math.random() * canvas.height * 0.5;
-      const angle = Math.random() * (Math.PI / 3) + Math.PI / 6; //30-90deg
-      const speed = 4;
-      const vx = side < 0 ? Math.cos(angle) * speed : -Math.cos(angle) * speed;
-      const vy = Math.sin(angle) * speed;
-      const type = Math.random() < 0.7 ? "cucumber" : "baseball";
-      objects.push({ x, y, vx, vy, type });
-    }
+        const komaruSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 35 45 60"><g><ellipse cx="80" cy="70" rx="11" ry="15" fill="white" stroke="black" stroke-width="2" /><ellipse cx="80" cy="50" rx="12.5" ry="10" fill="white" stroke="black" stroke-width="2" /><path d="M 72.5 48 Q 65 43, 65 50" fill="white" stroke="black" stroke-width="2" /><path d="M 87.5 48 Q 95 43, 95 50" fill="white" stroke="black" stroke-width="2" /><circle cx="76" cy="49" r="1" fill="black" /><circle cx="84" cy="49" r="1" fill="black" /><circle cx="80" cy="52" r="1" fill="black" /><path d="M 76 55 Q 80 56, 84 55" stroke="black" stroke-width="1" fill="none" /><path d="M 73 39 L 78 43" stroke="black" stroke-width="1" fill="none" /><path d="M 87 39 L 82 43" stroke="black" stroke-width="1" fill="none" /></g></svg>`;
+        const komaruImage = new Image();
+        komaruImage.src = `data:image/svg+xml;base64,${btoa(komaruSVG)}`;
+        
+        const cucumberSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50"><defs><linearGradient id="cucumberGrad" gradientTransform="rotate(135)"><stop offset="25%" stop-color="#2e7d32"/><stop offset="50%" stop-color="#4caf50"/><stop offset="70%" stop-color="#66bb6a"/><stop offset="100%" stop-color="#43a047"/></linearGradient></defs><g transform="rotate(-15 50 25)"><ellipse cx="50" cy="25" rx="50" ry="15" fill="url(#cucumberGrad)"/><circle cx="15" cy="22" r="1.5" fill="#1b5e20" opacity="0.8"/><circle cx="30" cy="32" r="1.5" fill="#1b5e20" opacity="0.8"/><circle cx="50" cy="19" r="1.5" fill="#1b5e20" opacity="0.8"/><circle cx="70" cy="33" r="1.5" fill="#1b5e20" opacity="0.8"/><circle cx="85" cy="23" r="1.5" fill="#1b5e20" opacity="0.8"/><rect x="-2" y="20" width="10" height="8" fill="#6d4c41" rx="2"/></g></svg>`;
+        const cucumberImage = new Image();
+        cucumberImage.src = `data:image/svg+xml;base64,${btoa(cucumberSVG)}`;
 
-    function render() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // ★赤い車のSVGを追加
+        const carSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30"><path d="M5,10 h50 a5,5 0 0 1 5,5 v10 a5,5 0 0 1 -5,5 h-50 a5,5 0 0 1 -5,-5 v-10 a5,5 0 0 1 5,-5 z" fill="#d32f2f" stroke="black" stroke-width="1.5"/><path d="M10,5 h30 v10 h-30 z" fill="#ffcdd2" stroke="#a02424" stroke-width="1"/><circle cx="15" cy="25" r="5" fill="#212121" stroke="black" stroke-width="1"/><circle cx="45" cy="25" r="5" fill="#212121" stroke="black" stroke-width="1"/></svg>`;
+        const carImage = new Image();
+        carImage.src = `data:image/svg+xml;base64,${btoa(carSVG)}`;
 
-      // フィーバー時は背景色変更
-      if (performance.now() < feverUntil) {
-        ctx.fillStyle = "#330033";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-      }
 
-      // プレイヤー
-      ctx.drawImage(
-        images.player,
-        player.x - PLAYER_RADIUS,
-        player.y - PLAYER_RADIUS,
-        PLAYER_RADIUS * 2,
-        PLAYER_RADIUS * 2
-      );
+        // --- ゲームオブジェクト設定 ---
+        let player = {};
+        let komaruPlayer = null;
+        let shrimps = [];
+        let cucumbers = [];
+        let cars = []; // ★追加
+        let shrimpData = {};
+        let cucumberData = {};
+        let carData = {}; // ★追加
+        const keys = { left: false, right: false };
+        let lastSpawn = -1;
+        let lastCarSpawn = -1; // ★追加
+        let cucumberHasBeenCaught = false;
+        let feverTimerId = null; 
+        let isFeverTime = false;
 
-      // オブジェクト
-      objects.forEach((obj) => {
-        if (obj.type === "pet") {
-          ctx.globalAlpha = 1 - (performance.now() - obj.data.born) / obj.data.life;
-          ctx.drawImage(
-            obj.data.img,
-            obj.data.x - OBJECT_RADIUS,
-            obj.data.y - OBJECT_RADIUS,
-            OBJECT_RADIUS * 2,
-            OBJECT_RADIUS * 2
-          );
-          ctx.globalAlpha = 1;
-          return;
+        // ゲーム開始時に変数をリセットする
+        function resetObjects() {
+            player = { size: size * 0.08, angle: 0, speed: 0.05, orbitRadius: size * 0.3, x: 0, y: 0 };
+            komaruPlayer = null;
+            shrimps = [];
+            cucumbers = [];
+            cars = []; // ★追加
+            shrimpData = { size: size * 0.06, spawnRate: 1000, originalSpawnRate: 1000, speed: 1 };
+            cucumberData = { size: size * 0.05, speed: 2 }; 
+            carData = { size: size * 0.08, speed: 1.3 }; // ★追加
+            cucumberHasBeenCaught = false; 
+            
+            clearTimeout(feverTimerId);
+            isFeverTime = false;
+            if(shrimpData.spawnRate !== shrimpData.originalSpawnRate) {
+                shrimpData.spawnRate = shrimpData.originalSpawnRate;
+            }
         }
-        ctx.drawImage(
-          images[obj.type],
-          obj.x - OBJECT_RADIUS,
-          obj.y - OBJECT_RADIUS,
-          OBJECT_RADIUS * 2,
-          OBJECT_RADIUS * 2
-        );
-      });
-    }
-  </script>
+
+        // --- イベントリスナー ---
+        window.addEventListener('keydown', (e) => { if(gameRunning) { if (e.key === 'ArrowLeft') keys.left = true; if (e.key === 'ArrowRight') keys.right = true; }});
+        window.addEventListener('keyup', (e) => { if (e.key === 'ArrowLeft') keys.left = false; if (e.key === 'ArrowRight') keys.right = false; });
+        canvas.addEventListener('touchstart', (e) => { if(gameRunning) { e.preventDefault(); const touchX = e.touches[0].clientX - canvas.getBoundingClientRect().left; keys.left = touchX < canvas.width / 2; keys.right = touchX >= canvas.width / 2; }});
+        canvas.addEventListener('touchend', (e) => { e.preventDefault(); keys.left = false; keys.right = false; });
+        startScreen.addEventListener('click', () => { if (!gameRunning && firebaseConfig.apiKey !== "YOUR_API_KEY") startGame() });
+
+        // --- ゲーム進行 ---
+        function startGame() { gameRunning = true; score = 0; timeLeft = GAME_DURATION; finalScoreEl.textContent = ''; startText.textContent = 'Click or Tap to Start ▶︎'; startScreen.style.display = 'none'; resetObjects(); updateScore(); timerEl.textContent = `残り時間: ${timeLeft}`; timerId = setInterval(() => { timeLeft--; timerEl.textContent = `残り時間: ${timeLeft}`; if (timeLeft <= 0) { endGame(); }}, 1000); gameLoop(); }
+        async function endGame() { clearInterval(timerId); gameRunning = false; keys.left = false; keys.right = false; finalScoreEl.textContent = `Final Score: ${score}`; startText.textContent = "Play Again！"; startScreen.style.display = 'flex'; if (db && userId) { try { await addDoc(collection(db, "scores"), { userId: userId, score: score, timestamp: serverTimestamp() }); } catch (error) { console.error("Error writing document: ", error); }}}
+
+        // フィーバータイムを開始する関数
+        function startFeverTime() {
+            const FEVER_DURATION = 3000;
+            const FEVER_SPAWN_RATE = 100;
+
+            isFeverTime = true;
+            shrimpData.spawnRate = FEVER_SPAWN_RATE;
+
+            clearTimeout(feverTimerId);
+            feverTimerId = setTimeout(endFeverTime, FEVER_DURATION);
+        }
+
+        // ★修正: フィーバータイムを終了する関数にkomaruを消す処理を追加
+        function endFeverTime() {
+            isFeverTime = false;
+            shrimpData.spawnRate = shrimpData.originalSpawnRate;
+            komaruPlayer = null; // komaruを消す
+        }
+
+        // --- ゲームロジック ---
+        function spawnShrimp() { const angle = Math.random() * Math.PI * 2; const radius = size * 0.48; shrimps.push({ x: center.x + radius * Math.cos(angle), y: center.y + radius * Math.sin(angle), angle: angle, });}
+        
+        function spawnCucumber() { const angle = Math.random() * Math.PI * 2; const radius = size * 0.48; cucumbers.push({ x: center.x + radius * Math.cos(angle), y: center.y + radius * Math.sin(angle), angle: angle, });}
+        
+        // ★車を出現させる関数を追加
+        function spawnCar() { const angle = Math.random() * Math.PI * 2; const radius = size * 0.48; cars.push({ x: center.x + radius * Math.cos(angle), y: center.y + radius * Math.sin(angle), angle: angle, });}
+
+        function updatePlayer() {
+            if (keys.left) player.angle -= player.speed;
+            if (keys.right) player.angle += player.speed;
+            player.x = center.x + player.orbitRadius * Math.cos(player.angle);
+            player.y = center.y + player.orbitRadius * Math.sin(player.angle);
+
+            if (komaruPlayer) {
+                komaruPlayer.angle = player.angle + Math.PI;
+                komaruPlayer.x = center.x + komaruPlayer.orbitRadius * Math.cos(komaruPlayer.angle);
+                komaruPlayer.y = center.y + komaruPlayer.orbitRadius * Math.sin(komaruPlayer.angle);
+            }
+        }
+        
+        function updateItems() {
+            // エビフライの更新と当たり判定
+            for (let i = shrimps.length - 1; i >= 0; i--) {
+                const s = shrimps[i];
+                const dx = center.x - s.x;
+                const dy = center.y - s.y;
+                const distToCenter = Math.sqrt(dx * dx + dy * dy);
+                s.x += (dx / distToCenter) * shrimpData.speed;
+                s.y += (dy / distToCenter) * shrimpData.speed;
+
+                const playerDist = Math.sqrt(Math.pow(player.x - s.x, 2) + Math.pow(player.y - s.y, 2));
+                if (playerDist < player.size / 2 + shrimpData.size / 2) {
+                    shrimps.splice(i, 1);
+                    score++;
+                    updateScore();
+                    continue;
+                }
+                
+                if (komaruPlayer) {
+                    const komaruSize = player.size;
+                    const komaruDist = Math.sqrt(Math.pow(komaruPlayer.x - s.x, 2) + Math.pow(komaruPlayer.y - s.y, 2));
+                    if (komaruDist < komaruSize / 2 + shrimpData.size / 2) {
+                        shrimps.splice(i, 1);
+                        score++;
+                        updateScore();
+                        continue;
+                    }
+                }
+                
+                if (distToCenter < size * 0.12) {
+                    shrimps.splice(i, 1);
+                }
+            }
+            
+            // きゅうりの更新と当たり判定
+            for (let i = cucumbers.length - 1; i >= 0; i--) {
+                const c = cucumbers[i];
+                const dx = center.x - c.x;
+                const dy = center.y - c.y;
+                const distToCenter = Math.sqrt(dx * dx + dy * dy);
+                c.x += (dx / distToCenter) * cucumberData.speed;
+                c.y += (dy / distToCenter) * cucumberData.speed;
+
+                const playerDist = Math.sqrt(Math.pow(player.x - c.x, 2) + Math.pow(player.y - c.y, 2));
+                if (playerDist < player.size / 2 + cucumberData.size / 2) {
+                    cucumbers.splice(i, 1);
+                    if (!cucumberHasBeenCaught) {
+                        cucumberHasBeenCaught = true;
+                        activateKomaru();
+                    }
+                } else if (distToCenter < size * 0.12) {
+                    cucumbers.splice(i, 1);
+                }
+            }
+
+            // ★車の更新と当たり判定を追加
+            for (let i = cars.length - 1; i >= 0; i--) {
+                const car = cars[i];
+                const dx = center.x - car.x;
+                const dy = center.y - car.y;
+                const distToCenter = Math.sqrt(dx * dx + dy * dy);
+                car.x += (dx / distToCenter) * carData.speed;
+                car.y += (dy / distToCenter) * carData.speed;
+
+                const playerDist = Math.sqrt(Math.pow(player.x - car.x, 2) + Math.pow(player.y - car.y, 2));
+                if (playerDist < player.size / 2 + carData.size / 2) {
+                    cars.splice(i, 1);
+                    score -= 5;
+                    if (score < 0) score = 0; // スコアがマイナスにならないようにする
+                    updateScore();
+                    continue; // プレイヤーに当たったら他の判定は不要
+                }
+                
+                // ブラックホールに吸い込まれた場合
+                if (distToCenter < size * 0.12) {
+                    cars.splice(i, 1);
+                }
+            }
+        }
+        
+        function activateKomaru() {
+            if (!komaruPlayer) {
+                komaruPlayer = { ...player, angle: player.angle + Math.PI };
+                startFeverTime();
+            }
+        }
+
+        function updateScore() { scoreEl.textContent = `エビフライ: ${score}`; }
+
+        // --- 描画 ---
+        function drawBlackhole() {
+            ctx.save();
+            
+            if (isFeverTime) {
+                const hue = (performance.now() / 20) % 360;
+                const rainbowGradient = ctx.createRadialGradient(center.x, center.y, size * 0.08, center.x, center.y, size * 0.5);
+                rainbowGradient.addColorStop(0, `hsl(${(hue + 0) % 360}, 80%, 60%)`);
+                rainbowGradient.addColorStop(0.2, `hsl(${(hue + 60) % 360}, 80%, 60%)`);
+                rainbowGradient.addColorStop(0.4, `hsl(${(hue + 120) % 360}, 80%, 60%)`);
+                rainbowGradient.addColorStop(0.6, `hsl(${(hue + 180) % 360}, 80%, 60%)`);
+                rainbowGradient.addColorStop(0.8, `hsl(${(hue + 240) % 360}, 80%, 60%)`);
+                rainbowGradient.addColorStop(1, `hsl(${(hue + 300) % 360}, 80%, 60%)`);
+                ctx.fillStyle = rainbowGradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } else {
+                const diskGradient = ctx.createRadialGradient(center.x, center.y, size * 0.1, center.x, center.y, size * 0.45);
+                diskGradient.addColorStop(0, 'rgba(0,0,0,0)');
+                diskGradient.addColorStop(0.3, 'orangered');
+                diskGradient.addColorStop(0.6, 'orange');
+                diskGradient.addColorStop(1, 'rgba(255, 215, 0, 0.3)');
+                ctx.fillStyle = diskGradient;
+                ctx.beginPath();
+                ctx.ellipse(center.x, center.y, size * 0.45, size * 0.25, 0, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+            
+            const rings = [{ r: 0.13, c: "orangered" }, { r: 0.12, c: "black" }, { r: 0.11, c: "orangered" }, { r: 0.10, c: "black" }, { r: 0.09, c: "orangered" }, { r: 0.08, c: "black" }];
+            rings.forEach(ring => {
+                ctx.strokeStyle = ring.c;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(center.x, center.y, size * ring.r, 0, 2 * Math.PI);
+                ctx.stroke();
+            });
+            ctx.fillStyle = 'black';
+            ctx.beginPath();
+            ctx.arc(center.x, center.y, size * 0.08, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.restore();
+        }
+        
+        function drawGameObjects() {
+            // ロセツ描画
+            ctx.save();
+            ctx.translate(player.x, player.y);
+            ctx.rotate(player.angle + Math.PI / 2);
+            if (rosetsuImage.complete) { ctx.drawImage(rosetsuImage, -player.size / 2, -player.size / 2, player.size, player.size); }
+            ctx.restore();
+
+            // komaru描画
+            if (komaruPlayer) {
+                ctx.save();
+                ctx.translate(komaruPlayer.x, komaruPlayer.y);
+                ctx.rotate(komaruPlayer.angle + Math.PI / 2);
+                if (komaruImage.complete) {
+                    const komaruSize = player.size;
+                    ctx.drawImage(komaruImage, -komaruSize / 2, -komaruSize / 2, komaruSize, komaruSize);
+                }
+                ctx.restore();
+            }
+
+            // エビフライ描画
+            shrimps.forEach(s => {
+                ctx.save();
+                ctx.translate(s.x, s.y);
+                ctx.rotate(s.angle + Math.PI / 2);
+                if (shrimpImage.complete) { ctx.drawImage(shrimpImage, -shrimpData.size / 2, -shrimpData.size / 2, shrimpData.size, shrimpData.size); }
+                ctx.restore();
+            });
+
+            // きゅうり描画
+            cucumbers.forEach(c => {
+                ctx.save();
+                ctx.translate(c.x, c.y);
+                ctx.rotate(c.angle + Math.PI / 2);
+                if (cucumberImage.complete) { ctx.drawImage(cucumberImage, -cucumberData.size / 2, -cucumberData.size / 2, cucumberData.size, cucumberData.size); }
+                ctx.restore();
+            });
+
+            // ★車描画を追加
+            cars.forEach(car => {
+                ctx.save();
+                ctx.translate(car.x, car.y);
+                ctx.rotate(car.angle + Math.PI / 2); // 進行方向を向く
+                if (carImage.complete) {
+                    // SVGのアスペクト比に合わせて描画サイズを調整
+                    ctx.drawImage(carImage, -carData.size / 2, -carData.size / 4, carData.size, carData.size / 2);
+                }
+                ctx.restore();
+            });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBlackhole();
+            if (gameRunning || score > 0 || timeLeft < GAME_DURATION) {
+                drawGameObjects();
+            }
+        }
+
+        // --- メインループ ---
+        function gameLoop(timestamp) {
+            if (!gameRunning) return;
+
+            // ★エビフライ・きゅうりの出現ロジックを修正
+            if (timestamp - lastSpawn > shrimpData.spawnRate) {
+                lastSpawn = timestamp;
+                if (isFeverTime) {
+                    spawnShrimp();
+                } else if (!cucumberHasBeenCaught && cucumbers.length === 0 && timeLeft < GAME_DURATION - 5 && timeLeft > 10 && Math.random() < 0.3) {
+                    spawnCucumber();
+                } else {
+                    spawnShrimp();
+                }
+            }
+
+            // ★車の出現ロジックを追加
+            const CAR_SPAWN_INTERVAL = 4000; // 4秒ごとに出現
+            if (!isFeverTime && timestamp - lastCarSpawn > CAR_SPAWN_INTERVAL) {
+                lastCarSpawn = timestamp;
+                spawnCar();
+            }
+
+            updatePlayer();
+            updateItems();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // --- ランキング ---
+        function setupLeaderboardListener() {
+            if (!db) return;
+            const q = query(collection(db, "scores"), orderBy("score", "desc"), limit(5));
+            onSnapshot(q, (snapshot) => {
+                scoreListEl.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const idPart = `...${data.userId.slice(-6)}`;
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span>${data.userId === userId ? 'YOU' : idPart}</span> <span class="score-val">${data.score}</span>`;
+                    if (data.userId === userId) {
+                        li.style.color = '#00bfff';
+                    }
+                    scoreListEl.appendChild(li);
+                });
+            }, (error) => { console.error("Error getting leaderboard: ", error); scoreListEl.innerHTML = '<li>ランキングの取得に失敗しました</li>'; });
+        }
+
+        // --- 初期化 ---
+        window.addEventListener('resize', () => { size = gameContainer.clientWidth; canvas.width = size; canvas.height = size; center = { x: size / 2, y: size / 2 }; resetObjects(); draw(); });
+        
+        let imagesLoaded = 0;
+        function onImageLoad() {
+            if (++imagesLoaded === 5) { // ★4から5に変更
+                draw();
+            }
+        }
+        rosetsuImage.onload = onImageLoad;
+        shrimpImage.onload = onImageLoad;
+        komaruImage.onload = onImageLoad;
+        cucumberImage.onload = onImageLoad;
+        carImage.onload = onImageLoad; // ★追加
+        resetObjects();
+    </script>
 </body>
 </html>
