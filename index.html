@@ -6,7 +6,7 @@
     <title>ロセツのブラックホールアドベンチャー</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/icon-192x192.png">
-    
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&display=swap');
 
@@ -192,15 +192,15 @@
         };
 
         // --- DOM要素の取得 ---
-        const canvas = document.getElementById('game-canvas');
-        const ctx = canvas.getContext('2d');
-        const scoreEl = document.getElementById('score');
-        const timerEl = document.getElementById('timer');
-        const startScreen = document.getElementById('start-screen');
-        const startText = document.getElementById('start-text');
-        const finalScoreEl = document.getElementById('final-score');
+        const canvas        = document.getElementById('game-canvas');
+        const ctx           = canvas.getContext('2d');
+        const scoreEl       = document.getElementById('score');
+        const timerEl       = document.getElementById('timer');
+        const startScreen   = document.getElementById('start-screen');
+        const startText     = document.getElementById('start-text');
+        const finalScoreEl  = document.getElementById('final-score');
         const gameContainer = document.getElementById('game-container');
-        const scoreListEl = document.getElementById('score-list');
+        const scoreListEl   = document.getElementById('score-list');
         const userIdDisplay = document.getElementById('user-id-display');
 
         // --- ゲーム設定 ---
@@ -212,7 +212,7 @@
 
         // --- キャンバスサイズ設定 ---
         let size = gameContainer.clientWidth;
-        canvas.width = size;
+        canvas.width  = size;
         canvas.height = size;
         let center = { x: size / 2, y: size / 2 };
 
@@ -223,7 +223,7 @@
                 throw new Error("Firebase config is not set. Please follow the setup guide.");
             }
             const app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
+            db   = getFirestore(app);
             auth = getAuth(app);
 
             onAuthStateChanged(auth, user => {
@@ -242,57 +242,67 @@
             startText.innerHTML = "ランキング機能を使うには<br>設定が必要です";
         }
 
-        // --- SVGデータ ---
-        const rosetsuSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 28 40 50"><g><ellipse cx="50" cy="60" rx="11" ry="15" fill="white" stroke="black" stroke-width="2" /><ellipse cx="50" cy="40" rx="12.5" ry="10" fill="white" stroke="black" stroke-width="2" /><path d="M 42.5 38 Q 35 33, 35 40" fill="white" stroke="black" stroke-width="2" /><path d="M 57.5 38 Q 65 33, 65 40" fill="white" stroke="black" stroke-width="2" /><circle cx="46" cy="39" r="1" fill="black" /><circle cx="54" cy="39" r="1" fill="black" /><circle cx="50" cy="42" r="1" fill="black" /><path d="M 46 45 Q 50 46, 54 45" stroke="black" stroke-width="1" fill="none" /></g><g><rect x="39" y="50" width="21" height="16" fill="#ffffe0" stroke="black" stroke-width="1.5" /><rect x="32" y="50" width="6" height="10" fill="#ffffe0" stroke="black" stroke-width="1.5" /><rect x="61" y="50" width="6" height="10" fill="#ffffe0" stroke="black" stroke-width="1.5" /></g></svg>`;
-        const rosetsuImage = new Image();
-        rosetsuImage.src = `data:image/svg+xml;base64,${btoa(rosetsuSVG)}`;
+        // --- SVGデータ定義 ---
+        const rosetsuSVG = `...省略...`;
+        const shrimpSVG  = `...省略...`;
+        const komaruSVG  = `...省略...`;
+        const cucumberSVG = `...省略...`;
+        const carSVG     = `...省略...`;
+        // --- ★ 新規追加 ---
+        const baseballSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><circle cx="30" cy="30" r="25" fill="white" stroke="black" stroke-width="1.2"/><path d="M12 15 Q30 22,48 15" fill="none" stroke="#e53935" stroke-width="2"/><path d="M12 45 Q30 38,48 45" fill="none" stroke="#e53935" stroke-width="2"/><g stroke="#e53935" stroke-width="1.2"><line x1="17" y1="18" x2="20" y2="19"/><line x1="23" y1="20" x2="26" y2="21"/><line x1="29" y1="22" x2="32" y2="23"/><line x1="35" y1="22" x2="38" y2="23"/><line x1="41" y1="20" x2="44" y2="19"/><line x1="17" y1="42" x2="20" y2="41"/><line x1="23" y1="40" x2="26" y2="39"/><line x1="29" y1="38" x2="32" y2="37"/><line x1="35" y1="38" x2="38" y2="37"/><line x1="41" y1="40" x2="44" y2="41"/></g></svg>`;
 
-        const shrimpSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="45 50 10 15"><g><path d="M 49.5 54 Q 52.5 51, 49.5 52" fill="red" stroke="black" stroke-width="0.4" /> <path d="M 49.5 54 Q 46.5 51, 49.5 52" fill="red" stroke="black" stroke-width="0.4" /> <ellipse cx="49.5" cy="57.5" rx="2" ry="5" fill="#FF9800" stroke="black" stroke-width="0.4" /><ellipse cx="49.5" cy="57.5" rx="2.4" ry="5.6" fill="none" stroke="black" stroke-dasharray="0.8" stroke-width="0.2" /></g></svg>`;
-        const shrimpImage = new Image();
-        shrimpImage.src = `data:image/svg+xml;base64,${btoa(shrimpSVG)}`;
+        const tetsujiSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 140"><g transform="translate(40,10)"><ellipse cx="15" cy="70" rx="18" ry="12" fill="#f5deb3" stroke="black" stroke-width="2" transform="rotate(-40 15 70)"/><ellipse cx="85" cy="75" rx="55" ry="32" fill="#f5deb3" stroke="black" stroke-width="2"/><path d="M110 92 q18 20 -6 23 q-19 -1 -14 -22 z" fill="#f5deb3" stroke="black" stroke-width="2"/><path d="M70 92 q-18 18 5 22 q18 -1 13 -21 z" fill="#f5deb3" stroke="black" stroke-width="2"/><rect x="70" y="57" width="52" height="10" rx="5" fill="black"/><g transform="translate(95,67)"><circle r="8" fill="white" stroke="black" stroke-width="1.2"/><path d="M-5 -4 q5 3 10 0" fill="none" stroke="#e53935" stroke-width="1.3"/><path d="M-5  4 q5 -3 10 0" fill="none" stroke="#e53935" stroke-width="1.3"/></g><ellipse cx="96" cy="47" rx="40" ry="28" fill="#f5deb3" stroke="black" stroke-width="2"/><ellipse cx="96" cy="57" rx="25" ry="9" fill="#3d3532" stroke="black" stroke-width="1.5"/><ellipse cx="60" cy="42" rx="16" ry="14" fill="#f5deb3" stroke="black" stroke-width="2"/><ellipse cx="132" cy="42" rx="16" ry="14" fill="#f5deb3" stroke="black" stroke-width="2"/><g fill="black"><circle cx="82" cy="49" r="5"/><circle cx="110" cy="49" r="5"/><circle cx="80.5" cy="48" r="1.5" fill="white"/><circle cx="108.5" cy="48" r="1.5" fill="white"/><circle cx="96" cy="60" r="4"/><path d="M90 66 q6 4 12 0" fill="none" stroke="white" stroke-width="2"/></g><g stroke="#3d3532" stroke-width="4" stroke-linecap="round" fill="none"><path d="M74 41 q7 -6 14 0"/><path d="M102 41 q7 -6 14 0"/></g></g></svg>`;
 
-        const komaruSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 35 45 60"><g><ellipse cx="80" cy="70" rx="11" ry="15" fill="white" stroke="black" stroke-width="2" /><ellipse cx="80" cy="50" rx="12.5" ry="10" fill="white" stroke="black" stroke-width="2" /><path d="M 72.5 48 Q 65 43, 65 50" fill="white" stroke="black" stroke-width="2" /><path d="M 87.5 48 Q 95 43, 95 50" fill="white" stroke="black" stroke-width="2" /><circle cx="76" cy="49" r="1" fill="black" /><circle cx="84" cy="49" r="1" fill="black" /><circle cx="80" cy="52" r="1" fill="black" /><path d="M 76 55 Q 80 56, 84 55" stroke="black" stroke-width="1" fill="none" /><path d="M 73 39 L 78 43" stroke="black" stroke-width="1" fill="none" /><path d="M 87 39 L 82 43" stroke="black" stroke-width="1" fill="none" /></g></svg>`;
-        const komaruImage = new Image();
-        komaruImage.src = `data:image/svg+xml;base64,${btoa(komaruSVG)}`;
-        
-        const cucumberSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50"><defs><linearGradient id="cucumberGrad" gradientTransform="rotate(135)"><stop offset="25%" stop-color="#2e7d32"/><stop offset="50%" stop-color="#4caf50"/><stop offset="70%" stop-color="#66bb6a"/><stop offset="100%" stop-color="#43a047"/></linearGradient></defs><g transform="rotate(-15 50 25)"><ellipse cx="50" cy="25" rx="50" ry="15" fill="url(#cucumberGrad)"/><circle cx="15" cy="22" r="1.5" fill="#1b5e20" opacity="0.8"/><circle cx="30" cy="32" r="1.5" fill="#1b5e20" opacity="0.8"/><circle cx="50" cy="19" r="1.5" fill="#1b5e20" opacity="0.8"/><circle cx="70" cy="33" r="1.5" fill="#1b5e20" opacity="0.8"/><circle cx="85" cy="23" r="1.5" fill="#1b5e20" opacity="0.8"/><rect x="-2" y="20" width="10" height="8" fill="#6d4c41" rx="2"/></g></svg>`;
-        const cucumberImage = new Image();
-        cucumberImage.src = `data:image/svg+xml;base64,${btoa(cucumberSVG)}`;
-
-        // ★赤い車のSVGを追加
-        const carSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30"><path d="M5,10 h50 a5,5 0 0 1 5,5 v10 a5,5 0 0 1 -5,5 h-50 a5,5 0 0 1 -5,-5 v-10 a5,5 0 0 1 5,-5 z" fill="#d32f2f" stroke="black" stroke-width="1.5"/><path d="M10,5 h30 v10 h-30 z" fill="#ffcdd2" stroke="#a02424" stroke-width="1"/><circle cx="15" cy="25" r="5" fill="#212121" stroke="black" stroke-width="1"/><circle cx="45" cy="25" r="5" fill="#212121" stroke="black" stroke-width="1"/></svg>`;
-        const carImage = new Image();
-        carImage.src = `data:image/svg+xml;base64,${btoa(carSVG)}`;
-
+        // --- 画像オブジェクト ---
+        const rosetsuImage  = new Image(); rosetsuImage.src  = `data:image/svg+xml;base64,${btoa(rosetsuSVG)}`;
+        const shrimpImage   = new Image(); shrimpImage.src   = `data:image/svg+xml;base64,${btoa(shrimpSVG)}`;
+        const komaruImage   = new Image(); komaruImage.src   = `data:image/svg+xml;base64,${btoa(komaruSVG)}`;
+        const cucumberImage = new Image(); cucumberImage.src = `data:image/svg+xml;base64,${btoa(cucumberSVG)}`;
+        const carImage      = new Image(); carImage.src      = `data:image/svg+xml;base64,${btoa(carSVG)}`;
+        const baseballImage = new Image(); baseballImage.src = `data:image/svg+xml;base64,${btoa(baseballSVG)}`;
+        const tetsujiImage  = new Image(); tetsujiImage.src  = `data:image/svg+xml;base64,${btoa(tetsujiSVG)}`;
 
         // --- ゲームオブジェクト設定 ---
         let player = {};
-        let komaruPlayer = null;
-        let shrimps = [];
+        let komaruPlayer  = null;
+        let tetsujiPlayer = null;     // ★ 追加
+        let shrimps   = [];
         let cucumbers = [];
-        let cars = []; // ★追加
-        let shrimpData = {};
-        let cucumberData = {};
-        let carData = {}; // ★追加
-        const keys = { left: false, right: false };
-        let lastSpawn = -1;
-        let lastCarSpawn = -1; // ★追加
-        let cucumberHasBeenCaught = false;
-        let feverTimerId = null; 
-        let isFeverTime = false;
+        let baseballs = [];           // ★ 追加
+        let cars      = [];
 
-        // ゲーム開始時に変数をリセットする
+        let shrimpData   = {};
+        let cucumberData = {};
+        let baseballData = {};        // ★ 追加
+        let carData      = {};
+
+        const keys = { left: false, right: false };
+        let lastSpawn     = -1;
+        let lastCarSpawn  = -1;
+        let baseballHasBeenCaught  = false; // ★ 追加
+        let cucumberHasBeenCaught  = false;
+        let feverTimerId = null;
+        let isFeverTime  = false;
+
+        // --- 初期化/リセット ---
         function resetObjects() {
             player = { size: size * 0.08, angle: 0, speed: 0.05, orbitRadius: size * 0.3, x: 0, y: 0 };
-            komaruPlayer = null;
-            shrimps = [];
+            komaruPlayer  = null;
+            tetsujiPlayer = null; // ★
+
+            shrimps   = [];
             cucumbers = [];
-            cars = []; // ★追加
-            shrimpData = { size: size * 0.06, spawnRate: 1000, originalSpawnRate: 1000, speed: 1 };
-            cucumberData = { size: size * 0.05, speed: 2 }; 
-            carData = { size: size * 0.08, speed: 1.3 }; // ★追加
-            cucumberHasBeenCaught = false; 
-            
+            baseballs = []; // ★
+            cars      = [];
+
+            shrimpData   = { size: size * 0.06, spawnRate: 1000, originalSpawnRate: 1000, speed: 1 };
+            cucumberData = { size: size * 0.05, speed: 2 };
+            baseballData = { size: size * 0.06, speed: 1.8 }; // ★
+            carData      = { size: size * 0.08, speed: 1.3 };
+
+            cucumberHasBeenCaught = false;
+            baseballHasBeenCaught = false; // ★
+
             clearTimeout(feverTimerId);
             isFeverTime = false;
             if(shrimpData.spawnRate !== shrimpData.originalSpawnRate) {
@@ -301,45 +311,92 @@
         }
 
         // --- イベントリスナー ---
-        window.addEventListener('keydown', (e) => { if(gameRunning) { if (e.key === 'ArrowLeft') keys.left = true; if (e.key === 'ArrowRight') keys.right = true; }});
-        window.addEventListener('keyup', (e) => { if (e.key === 'ArrowLeft') keys.left = false; if (e.key === 'ArrowRight') keys.right = false; });
-        canvas.addEventListener('touchstart', (e) => { if(gameRunning) { e.preventDefault(); const touchX = e.touches[0].clientX - canvas.getBoundingClientRect().left; keys.left = touchX < canvas.width / 2; keys.right = touchX >= canvas.width / 2; }});
-        canvas.addEventListener('touchend', (e) => { e.preventDefault(); keys.left = false; keys.right = false; });
+        window.addEventListener('keydown', (e) => {
+            if(!gameRunning) return;
+            if (e.key === 'ArrowLeft')  keys.left  = true;
+            if (e.key === 'ArrowRight') keys.right = true;
+        });
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft')  keys.left  = false;
+            if (e.key === 'ArrowRight') keys.right = false;
+        });
+        canvas.addEventListener('touchstart', (e) => {
+            if(!gameRunning) return;
+            e.preventDefault();
+            const touchX = e.touches[0].clientX - canvas.getBoundingClientRect().left;
+            keys.left  = touchX < canvas.width / 2;
+            keys.right = touchX >= canvas.width / 2;
+        });
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            keys.left = keys.right = false;
+        });
         startScreen.addEventListener('click', () => { if (!gameRunning && firebaseConfig.apiKey !== "YOUR_API_KEY") startGame() });
 
-        // --- ゲーム進行 ---
-        function startGame() { gameRunning = true; score = 0; timeLeft = GAME_DURATION; finalScoreEl.textContent = ''; startText.textContent = 'Click or Tap to Start ▶︎'; startScreen.style.display = 'none'; resetObjects(); updateScore(); timerEl.textContent = `残り時間: ${timeLeft}`; timerId = setInterval(() => { timeLeft--; timerEl.textContent = `残り時間: ${timeLeft}`; if (timeLeft <= 0) { endGame(); }}, 1000); gameLoop(); }
-        async function endGame() { clearInterval(timerId); gameRunning = false; keys.left = false; keys.right = false; finalScoreEl.textContent = `Final Score: ${score}`; startText.textContent = "Play Again！"; startScreen.style.display = 'flex'; if (db && userId) { try { await addDoc(collection(db, "scores"), { userId: userId, score: score, timestamp: serverTimestamp() }); } catch (error) { console.error("Error writing document: ", error); }}}
+        // --- ゲーム開始/終了 ---
+        function startGame() {
+            gameRunning   = true;
+            score         = 0;
+            timeLeft      = GAME_DURATION;
+            finalScoreEl.textContent = '';
+            startText.textContent    = 'Click or Tap to Start ▶︎';
+            startScreen.style.display = 'none';
+            resetObjects();
+            updateScore();
+            timerEl.textContent = `残り時間: ${timeLeft}`;
+            timerId = setInterval(() => {
+                timeLeft--;
+                timerEl.textContent = `残り時間: ${timeLeft}`;
+                if (timeLeft <= 0) endGame();
+            }, 1000);
+            gameLoop();
+        }
 
-        // フィーバータイムを開始する関数
+        async function endGame() {
+            clearInterval(timerId);
+            gameRunning = false;
+            keys.left = keys.right = false;
+            finalScoreEl.textContent = `Final Score: ${score}`;
+            startText.textContent    = "Play Again！";
+            startScreen.style.display = 'flex';
+
+            if (db && userId) {
+                try {
+                    await addDoc(collection(db, "scores"), { userId, score, timestamp: serverTimestamp() });
+                } catch (error) { console.error("Error writing document: ", error); }
+            }
+        }
+
+        // --- フィーバー管理 ---
         function startFeverTime() {
-            const FEVER_DURATION = 3000;
+            const FEVER_DURATION   = 3000;
             const FEVER_SPAWN_RATE = 100;
-
             isFeverTime = true;
             shrimpData.spawnRate = FEVER_SPAWN_RATE;
-
             clearTimeout(feverTimerId);
             feverTimerId = setTimeout(endFeverTime, FEVER_DURATION);
         }
-
-        // ★修正: フィーバータイムを終了する関数にkomaruを消す処理を追加
         function endFeverTime() {
             isFeverTime = false;
             shrimpData.spawnRate = shrimpData.originalSpawnRate;
-            komaruPlayer = null; // komaruを消す
+            komaruPlayer = null;
         }
 
-        // --- ゲームロジック ---
-        function spawnShrimp() { const angle = Math.random() * Math.PI * 2; const radius = size * 0.48; shrimps.push({ x: center.x + radius * Math.cos(angle), y: center.y + radius * Math.sin(angle), angle: angle, });}
-        
-        function spawnCucumber() { const angle = Math.random() * Math.PI * 2; const radius = size * 0.48; cucumbers.push({ x: center.x + radius * Math.cos(angle), y: center.y + radius * Math.sin(angle), angle: angle, });}
-        
-        // ★車を出現させる関数を追加
-        function spawnCar() { const angle = Math.random() * Math.PI * 2; const radius = size * 0.48; cars.push({ x: center.x + radius * Math.cos(angle), y: center.y + radius * Math.sin(angle), angle: angle, });}
+        // --- スポーン関数群 ---
+        const spawnShrimp = () => commonSpawn(shrimps);
+        const spawnCucumber = () => commonSpawn(cucumbers);
+        const spawnBaseball = () => commonSpawn(baseballs); // ★
+        const spawnCar      = () => commonSpawn(cars);
 
+        function commonSpawn(arr) {
+            const angle  = Math.random() * Math.PI * 2;
+            const radius = size * 0.48;
+            arr.push({ x: center.x + radius * Math.cos(angle), y: center.y + radius * Math.sin(angle), angle });
+        }
+
+        // --- プレイヤー更新 ---
         function updatePlayer() {
-            if (keys.left) player.angle -= player.speed;
+            if (keys.left)  player.angle -= player.speed;
             if (keys.right) player.angle += player.speed;
             player.x = center.x + player.orbitRadius * Math.cos(player.angle);
             player.y = center.y + player.orbitRadius * Math.sin(player.angle);
@@ -349,53 +406,54 @@
                 komaruPlayer.x = center.x + komaruPlayer.orbitRadius * Math.cos(komaruPlayer.angle);
                 komaruPlayer.y = center.y + komaruPlayer.orbitRadius * Math.sin(komaruPlayer.angle);
             }
+            if (tetsujiPlayer) {
+                tetsujiPlayer.angle = player.angle + Math.PI / 2; // 90度ずらす
+                tetsujiPlayer.x = center.x + tetsujiPlayer.orbitRadius * Math.cos(tetsujiPlayer.angle);
+                tetsujiPlayer.y = center.y + tetsujiPlayer.orbitRadius * Math.sin(tetsujiPlayer.angle);
+            }
         }
-        
+
+        // --- アイテム更新 ---
         function updateItems() {
-            // エビフライの更新と当たり判定
+            updateShrimps();
+            updateCucumbers();
+            updateBaseballs();
+            updateCars();
+        }
+
+        function moveTowardsCenter(obj, speed) {
+            const dx = center.x - obj.x;
+            const dy = center.y - obj.y;
+            const dist = Math.hypot(dx, dy);
+            obj.x += (dx / dist) * speed;
+            obj.y += (dy / dist) * speed;
+            return dist;
+        }
+
+        // --- 各オブジェクトごとの更新処理 ---
+        function updateShrimps() {
             for (let i = shrimps.length - 1; i >= 0; i--) {
                 const s = shrimps[i];
-                const dx = center.x - s.x;
-                const dy = center.y - s.y;
-                const distToCenter = Math.sqrt(dx * dx + dy * dy);
-                s.x += (dx / distToCenter) * shrimpData.speed;
-                s.y += (dy / distToCenter) * shrimpData.speed;
+                const distToCenter = moveTowardsCenter(s, shrimpData.speed);
 
-                const playerDist = Math.sqrt(Math.pow(player.x - s.x, 2) + Math.pow(player.y - s.y, 2));
-                if (playerDist < player.size / 2 + shrimpData.size / 2) {
+                // プレイヤー衝突判定
+                if (isCollide(player, player.size, s, shrimpData.size) ||
+                    (komaruPlayer && isCollide(komaruPlayer, player.size, s, shrimpData.size)) ||
+                    (tetsujiPlayer && isCollide(tetsujiPlayer, player.size, s, shrimpData.size))) {
                     shrimps.splice(i, 1);
                     score++;
                     updateScore();
                     continue;
                 }
-                
-                if (komaruPlayer) {
-                    const komaruSize = player.size;
-                    const komaruDist = Math.sqrt(Math.pow(komaruPlayer.x - s.x, 2) + Math.pow(komaruPlayer.y - s.y, 2));
-                    if (komaruDist < komaruSize / 2 + shrimpData.size / 2) {
-                        shrimps.splice(i, 1);
-                        score++;
-                        updateScore();
-                        continue;
-                    }
-                }
-                
-                if (distToCenter < size * 0.12) {
-                    shrimps.splice(i, 1);
-                }
+                if (distToCenter < size * 0.12) shrimps.splice(i, 1);
             }
-            
-            // きゅうりの更新と当たり判定
+        }
+
+        function updateCucumbers() {
             for (let i = cucumbers.length - 1; i >= 0; i--) {
                 const c = cucumbers[i];
-                const dx = center.x - c.x;
-                const dy = center.y - c.y;
-                const distToCenter = Math.sqrt(dx * dx + dy * dy);
-                c.x += (dx / distToCenter) * cucumberData.speed;
-                c.y += (dy / distToCenter) * cucumberData.speed;
-
-                const playerDist = Math.sqrt(Math.pow(player.x - c.x, 2) + Math.pow(player.y - c.y, 2));
-                if (playerDist < player.size / 2 + cucumberData.size / 2) {
+                const distToCenter = moveTowardsCenter(c, cucumberData.speed);
+                if (isCollide(player, player.size, c, cucumberData.size)) {
                     cucumbers.splice(i, 1);
                     if (!cucumberHasBeenCaught) {
                         cucumberHasBeenCaught = true;
@@ -405,36 +463,53 @@
                     cucumbers.splice(i, 1);
                 }
             }
+        }
 
-            // ★車の更新と当たり判定を追加
+        function updateBaseballs() {
+            for (let i = baseballs.length - 1; i >= 0; i--) {
+                const b = baseballs[i];
+                const distToCenter = moveTowardsCenter(b, baseballData.speed);
+                if (isCollide(player, player.size, b, baseballData.size)) {
+                    baseballs.splice(i, 1);
+                    if (!baseballHasBeenCaught) {
+                        baseballHasBeenCaught = true;
+                        activateTetsuji();
+                    }
+                } else if (distToCenter < size * 0.12) {
+                    baseballs.splice(i, 1);
+                }
+            }
+        }
+
+        function updateCars() {
             for (let i = cars.length - 1; i >= 0; i--) {
                 const car = cars[i];
-                const dx = center.x - car.x;
-                const dy = center.y - car.y;
-                const distToCenter = Math.sqrt(dx * dx + dy * dy);
-                car.x += (dx / distToCenter) * carData.speed;
-                car.y += (dy / distToCenter) * carData.speed;
-
-                const playerDist = Math.sqrt(Math.pow(player.x - car.x, 2) + Math.pow(player.y - car.y, 2));
-                if (playerDist < player.size / 2 + carData.size / 2) {
+                const distToCenter = moveTowardsCenter(car, carData.speed);
+                if (isCollide(player, player.size, car, carData.size)) {
                     cars.splice(i, 1);
-                    score -= 5;
-                    if (score < 0) score = 0; // スコアがマイナスにならないようにする
+                    score = Math.max(0, score - 5);
                     updateScore();
-                    continue; // プレイヤーに当たったら他の判定は不要
-                }
-                
-                // ブラックホールに吸い込まれた場合
-                if (distToCenter < size * 0.12) {
+                } else if (distToCenter < size * 0.12) {
                     cars.splice(i, 1);
                 }
             }
         }
-        
+
+        // --- 衝突判定 ---
+        function isCollide(obj1, size1, obj2, size2) {
+            return Math.hypot(obj1.x - obj2.x, obj1.y - obj2.y) < (size1 / 2 + size2 / 2);
+        }
+
+        // --- 特殊アクション ---
         function activateKomaru() {
             if (!komaruPlayer) {
-                komaruPlayer = { ...player, angle: player.angle + Math.PI };
+                komaruPlayer = { ...player, orbitRadius: player.orbitRadius };
                 startFeverTime();
+            }
+        }
+        function activateTetsuji() {
+            if (!tetsujiPlayer) {
+                tetsujiPlayer = { ...player, orbitRadius: player.orbitRadius };
             }
         }
 
@@ -443,101 +518,58 @@
         // --- 描画 ---
         function drawBlackhole() {
             ctx.save();
-            
             if (isFeverTime) {
                 const hue = (performance.now() / 20) % 360;
-                const rainbowGradient = ctx.createRadialGradient(center.x, center.y, size * 0.08, center.x, center.y, size * 0.5);
-                rainbowGradient.addColorStop(0, `hsl(${(hue + 0) % 360}, 80%, 60%)`);
-                rainbowGradient.addColorStop(0.2, `hsl(${(hue + 60) % 360}, 80%, 60%)`);
-                rainbowGradient.addColorStop(0.4, `hsl(${(hue + 120) % 360}, 80%, 60%)`);
-                rainbowGradient.addColorStop(0.6, `hsl(${(hue + 180) % 360}, 80%, 60%)`);
-                rainbowGradient.addColorStop(0.8, `hsl(${(hue + 240) % 360}, 80%, 60%)`);
-                rainbowGradient.addColorStop(1, `hsl(${(hue + 300) % 360}, 80%, 60%)`);
-                ctx.fillStyle = rainbowGradient;
+                const rainbow = ctx.createRadialGradient(center.x, center.y, size * 0.08, center.x, center.y, size * 0.5);
+                for (let i = 0; i < 6; i++) rainbow.addColorStop(i / 5, `hsl(${(hue + i * 60) % 360},80%,60%)`);
+                ctx.fillStyle = rainbow;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
             } else {
-                const diskGradient = ctx.createRadialGradient(center.x, center.y, size * 0.1, center.x, center.y, size * 0.45);
-                diskGradient.addColorStop(0, 'rgba(0,0,0,0)');
-                diskGradient.addColorStop(0.3, 'orangered');
-                diskGradient.addColorStop(0.6, 'orange');
-                diskGradient.addColorStop(1, 'rgba(255, 215, 0, 0.3)');
-                ctx.fillStyle = diskGradient;
+                const disk = ctx.createRadialGradient(center.x, center.y, size * 0.1, center.x, center.y, size * 0.45);
+                disk.addColorStop(0, 'rgba(0,0,0,0)');
+                disk.addColorStop(0.3, 'orangered');
+                disk.addColorStop(0.6, 'orange');
+                disk.addColorStop(1, 'rgba(255,215,0,0.3)');
+                ctx.fillStyle = disk;
                 ctx.beginPath();
                 ctx.ellipse(center.x, center.y, size * 0.45, size * 0.25, 0, 0, 2 * Math.PI);
                 ctx.fill();
             }
-            
-            const rings = [{ r: 0.13, c: "orangered" }, { r: 0.12, c: "black" }, { r: 0.11, c: "orangered" }, { r: 0.10, c: "black" }, { r: 0.09, c: "orangered" }, { r: 0.08, c: "black" }];
-            rings.forEach(ring => {
-                ctx.strokeStyle = ring.c;
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.arc(center.x, center.y, size * ring.r, 0, 2 * Math.PI);
-                ctx.stroke();
-            });
+            const rings = [0.13,0.12,0.11,0.10,0.09,0.08];
+            rings.forEach((r,i)=>{ctx.strokeStyle = i%2?'black':'orangered';ctx.lineWidth=2;ctx.beginPath();ctx.arc(center.x,center.y,size*r,0,Math.PI*2);ctx.stroke();});
             ctx.fillStyle = 'black';
             ctx.beginPath();
-            ctx.arc(center.x, center.y, size * 0.08, 0, 2 * Math.PI);
+            ctx.arc(center.x, center.y, size * 0.08, 0, Math.PI * 2);
             ctx.fill();
             ctx.restore();
         }
-        
-        function drawGameObjects() {
-            // ロセツ描画
+
+        function drawEntity(img, entity, sz) {
             ctx.save();
-            ctx.translate(player.x, player.y);
-            ctx.rotate(player.angle + Math.PI / 2);
-            if (rosetsuImage.complete) { ctx.drawImage(rosetsuImage, -player.size / 2, -player.size / 2, player.size, player.size); }
+            ctx.translate(entity.x, entity.y);
+            ctx.rotate(entity.angle + Math.PI / 2);
+            if (img.complete) ctx.drawImage(img, -sz / 2, -sz / 2, sz, sz);
             ctx.restore();
-
-            // komaru描画
-            if (komaruPlayer) {
-                ctx.save();
-                ctx.translate(komaruPlayer.x, komaruPlayer.y);
-                ctx.rotate(komaruPlayer.angle + Math.PI / 2);
-                if (komaruImage.complete) {
-                    const komaruSize = player.size;
-                    ctx.drawImage(komaruImage, -komaruSize / 2, -komaruSize / 2, komaruSize, komaruSize);
-                }
-                ctx.restore();
-            }
-
-            // エビフライ描画
-            shrimps.forEach(s => {
-                ctx.save();
-                ctx.translate(s.x, s.y);
-                ctx.rotate(s.angle + Math.PI / 2);
-                if (shrimpImage.complete) { ctx.drawImage(shrimpImage, -shrimpData.size / 2, -shrimpData.size / 2, shrimpData.size, shrimpData.size); }
-                ctx.restore();
-            });
-
-            // きゅうり描画
-            cucumbers.forEach(c => {
-                ctx.save();
-                ctx.translate(c.x, c.y);
-                ctx.rotate(c.angle + Math.PI / 2);
-                if (cucumberImage.complete) { ctx.drawImage(cucumberImage, -cucumberData.size / 2, -cucumberData.size / 2, cucumberData.size, cucumberData.size); }
-                ctx.restore();
-            });
-
-            // ★車描画を追加
-            cars.forEach(car => {
-                ctx.save();
-                ctx.translate(car.x, car.y);
-                ctx.rotate(car.angle + Math.PI / 2); // 進行方向を向く
-                if (carImage.complete) {
-                    // SVGのアスペクト比に合わせて描画サイズを調整
-                    ctx.drawImage(carImage, -carData.size / 2, -carData.size / 4, carData.size, carData.size / 2);
-                }
-                ctx.restore();
-            });
         }
 
         function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0,0,canvas.width,canvas.height);
             drawBlackhole();
+
             if (gameRunning || score > 0 || timeLeft < GAME_DURATION) {
-                drawGameObjects();
+                shrimps.forEach(s => drawEntity(shrimpImage, s, shrimpData.size));
+                cucumbers.forEach(c => drawEntity(cucumberImage, c, cucumberData.size));
+                baseballs.forEach(b => drawEntity(baseballImage, b, baseballData.size));
+                cars.forEach(car => {
+                    ctx.save();
+                    ctx.translate(car.x,car.y);
+                    ctx.rotate(car.angle + Math.PI/2);
+                    if (carImage.complete) ctx.drawImage(carImage, -carData.size/2, -carData.size/4, carData.size, carData.size/2);
+                    ctx.restore();
+                });
+                drawEntity(rosetsuImage, player, player.size);
+                if (komaruPlayer)  drawEntity(komaruImage,  komaruPlayer, player.size);
+                if (tetsujiPlayer) drawEntity(tetsujiImage, tetsujiPlayer, player.size);
             }
         }
 
@@ -545,20 +577,20 @@
         function gameLoop(timestamp) {
             if (!gameRunning) return;
 
-            // ★エビフライ・きゅうりの出現ロジックを修正
             if (timestamp - lastSpawn > shrimpData.spawnRate) {
                 lastSpawn = timestamp;
                 if (isFeverTime) {
                     spawnShrimp();
                 } else if (!cucumberHasBeenCaught && cucumbers.length === 0 && timeLeft < GAME_DURATION - 5 && timeLeft > 10 && Math.random() < 0.3) {
                     spawnCucumber();
+                } else if (!baseballHasBeenCaught && baseballs.length === 0 && timeLeft < GAME_DURATION - 5 && timeLeft > 10 && Math.random() < 0.3) {
+                    spawnBaseball();
                 } else {
                     spawnShrimp();
                 }
             }
 
-            // ★車の出現ロジックを追加
-            const CAR_SPAWN_INTERVAL = 4000; // 4秒ごとに出現
+            const CAR_SPAWN_INTERVAL = 4000;
             if (!isFeverTime && timestamp - lastCarSpawn > CAR_SPAWN_INTERVAL) {
                 lastCarSpawn = timestamp;
                 spawnCar();
@@ -573,36 +605,42 @@
         // --- ランキング ---
         function setupLeaderboardListener() {
             if (!db) return;
-            const q = query(collection(db, "scores"), orderBy("score", "desc"), limit(5));
-            onSnapshot(q, (snapshot) => {
+            const q = query(collection(db, "scores"), orderBy("score","desc"), limit(5));
+            onSnapshot(q, snap => {
                 scoreListEl.innerHTML = '';
-                snapshot.forEach(doc => {
+                snap.forEach(doc => {
                     const data = doc.data();
                     const idPart = `...${data.userId.slice(-6)}`;
                     const li = document.createElement('li');
-                    li.innerHTML = `<span>${data.userId === userId ? 'YOU' : idPart}</span> <span class="score-val">${data.score}</span>`;
-                    if (data.userId === userId) {
-                        li.style.color = '#00bfff';
-                    }
+                    li.innerHTML = `<span>${data.userId===userId?'YOU':idPart}</span> <span class="score-val">${data.score}</span>`;
+                    if (data.userId===userId) li.style.color = '#00bfff';
                     scoreListEl.appendChild(li);
                 });
-            }, (error) => { console.error("Error getting leaderboard: ", error); scoreListEl.innerHTML = '<li>ランキングの取得に失敗しました</li>'; });
+            }, err => {
+                console.error(err);
+                scoreListEl.innerHTML = '<li>ランキングの取得に失敗しました</li>';
+            });
         }
 
-        // --- 初期化 ---
-        window.addEventListener('resize', () => { size = gameContainer.clientWidth; canvas.width = size; canvas.height = size; center = { x: size / 2, y: size / 2 }; resetObjects(); draw(); });
-        
+        // --- 初期描画 ---
+        window.addEventListener('resize', () => {
+            size = gameContainer.clientWidth;
+            canvas.width = canvas.height = size;
+            center = { x: size/2, y: size/2 };
+            resetObjects();
+            draw();
+        });
+
         let imagesLoaded = 0;
-        function onImageLoad() {
-            if (++imagesLoaded === 5) { // ★4から5に変更
-                draw();
-            }
-        }
-        rosetsuImage.onload = onImageLoad;
-        shrimpImage.onload = onImageLoad;
-        komaruImage.onload = onImageLoad;
+        function onImageLoad(){ if(++imagesLoaded === 7) draw(); }
+        rosetsuImage.onload  = onImageLoad;
+        shrimpImage.onload   = onImageLoad;
+        komaruImage.onload   = onImageLoad;
         cucumberImage.onload = onImageLoad;
-        carImage.onload = onImageLoad; // ★追加
+        carImage.onload      = onImageLoad;
+        baseballImage.onload = onImageLoad; // ★
+        tetsujiImage.onload  = onImageLoad; // ★
+
         resetObjects();
     </script>
 </body>
